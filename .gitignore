@@ -1,0 +1,12 @@
+﻿build
+CMakeFiles
+VisualStudio/vs2017
+VisualStudio/x64
+test-results/*.tga
+test-results/*.ktx
+test-results/*.dds
+test-results/*results.txt
+test-results/sumary.txt
+test-data/basis/basisu.exe
+Images/*.psd
+test-data/basis/temp/*.basis

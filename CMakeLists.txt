@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 3.13)
+project(GoofyTC)
+
+set(PROJECT_PATH ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT})
+set(CMAKE_INSTALL_PREFIX ${PROJECT_PATH})
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
+
+add_subdirectory(Src)
+
