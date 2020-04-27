@@ -9,7 +9,7 @@ Let's set our baseline to a texture downsampled by the factor of two in RGB565 f
 Why would we need a compressor that is very-very fast but cannot compete with well-known codecs in terms of quality?
 
 I think such a compressor might be useful for several reasons:
-- To quickly encode an uncompressed texture on the fly. When you need to use uncompressed texture for rendering, it may be a good option to compress it first using Goofy first to save some device memory and performance.
+- To quickly encode an uncompressed texture on the fly. When you need to use uncompressed texture for rendering, it may be a good option to compress it first using Goofy to save some device memory and performance.
 - To make a "preview" build for massive projects. Usually, you need to compress thousands of textures before you can play the build. Sometimes you don't care about texture quality that much, and you only want to get you playable build as fast as possible.
 - Quick preview for live-sync tools. You can immediately show any texture changes using Goofy and then run a more high-quality but slow encoder in parallel to improve the final look of the texture (progressive live texture sync)
 
