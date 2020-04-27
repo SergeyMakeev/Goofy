@@ -34,7 +34,7 @@ clear as possible and made a lot of comments to keep the data transformation flo
 ETC1 always encoded using ETC1s format.
 
 
-NOTE: Due to quantization based on perceptual brightness and because of ETC1s format limitation Goofy codec doesn't fit well for Normal Maps.
+**NOTE:** Due to quantization based on perceptual brightness and because of ETC1s format limitation Goofy codec doesn't fit well for Normal Maps.
 
 ## Performance and Quality
 
