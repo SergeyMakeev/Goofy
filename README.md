@@ -170,4 +170,5 @@ Real-Time YCoCg-DXT Compression by J.M.P. van Waveren and Ignacio Castano
 https://developer.download.nvidia.com/whitepapers/2007/Real-Time-YCoCg-DXT-Compression/Real-Time%20YCoCg-DXT%20Compression.pdf
 
 Real-Time DXT Compression by J.M.P. van Waveren
+
 http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.215.7942&rep=rep1&type=pdf
