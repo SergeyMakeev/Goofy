@@ -9,15 +9,15 @@ Let's set our baseline to a texture downsampled by the factor of two in RGB565 f
 Why would we need a compressor that is very-very fast but cannot compete with well-known codecs in terms of quality?
 
 I think such a compressor might be useful for several reasons:
-- To quickly encode an uncompressed texture on the fly. When you need to use uncompressed texture for rendering, it may be a good option to compress it first using Goofy to save some device memory and performance.
+- To quickly encode an uncompressed texture on the fly. When you need to use uncompressed texture for rendering (synthesised or fetched from the Internet), it may be a good option to compress it first using Goofy to save some device memory and performance.
 - To make a "preview" build for massive projects. Usually, you need to compress thousands of textures before you can play or test the  build. Sometimes you don't care about texture quality that much, and you only want to get you playable build as fast as possible.
 - Quick preview for live-sync tools. You can immediately show any texture changes using Goofy and then run a more high-quality but slow encoder in parallel to improve the final look of the texture (progressive live texture sync)
 
 ## Design Principles
 
 - Performance over quality.
-- One heuristics to rule them all. In favor of speed, I can't afford to check different combinations or explore a solution space deep enough.
-- SSE2 friendly. Let's get this SSE2 thing to the extreme! I should be able to run encoder sixteen SIMD lanes wide using SSE2 instruction set.
+- One heuristics to rule them all. _In favor of speed, I can't afford to check different combinations or explore a solution space deep enough._
+- SSE2 friendly. _Let's get this SSE2 thing to the extreme! I should be able to run encoder sixteen SIMD lanes wide using SSE2 instruction set._
 
 ## Goofy Algorithm
 
@@ -72,6 +72,9 @@ rg ETC1 | 3 | 40.87
 The following chart shows the RGB-PSNR vs. Performance for every image in the test image set.
 ![Comparison Chart](https://raw.githubusercontent.com/SergeyMakeev/goofy/master/Images/comparison_chart.png)
 
+
+**Note:** Comparison with "Basisu" is not fair, because this library is supercompressor and target to reduce the final image size. But this is the only ETC1S codec available to compare.
+
 ## Usage
 
 Goofy is a header-only library and it's very easy to use.
@@ -91,4 +94,14 @@ void test(unsigned char* result, const unsigned char* input, unsigned int width,
 
 ```
 
+## Next steps
 
+At some point, I hope I'll make a DXT5/ETC2 alpha encoder based on this code. It should be pretty much straightforward because I can use alpha directly instead of brightness.
+
+
+Look like it should be easy enough to write support for ARM NEON instruction set. Lack of `_mm_movemask_epi8` analog may cause some extra troubles, but everything else should be fine.
+
+
+I appreciate any push requests and improvements. Feel free to ping me and/or send your PRs.
+
+## Useful reading (in random order):
