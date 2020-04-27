@@ -72,6 +72,7 @@ rg ETC1 | 3 | 40.87
 The following chart shows the RGB-PSNR vs. Performance for every image in the test image set.
 ![Comparison Chart](https://raw.githubusercontent.com/SergeyMakeev/goofy/master/Images/comparison_chart.png)
 
+**Note:** As I mentioned earlier compressed Normal Map quality is way worse than photos or albedo textures.
 
 **Note:** Comparison with "Basisu" is not fair, because this library is supercompressor and target to reduce the final image size. But this is the only ETC1S codec available to compare.
 
