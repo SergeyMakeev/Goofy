@@ -38,7 +38,7 @@ ETC1 always encoded using ETC1s format.
 
 ## Performance and Quality
 
-All the performance timings below gathered for the following CPU: i7-7820HQ, 2.9Ghz single thread.
+All the performance timings below gathered for the following CPU: **i7-7820HQ, 2.9Ghz single thread**.
 To compute timings, I ran encoder 128 times and chose the fastest timing from the run to avoid noise from OS.
 
 Encoder | MP/s | RGB-PSNR (db)
