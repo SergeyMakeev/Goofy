@@ -4,8 +4,7 @@
 
 This is a very fast DXT/ETC encoder that I wrote, checking out the following idea. **"What if while we design a block compression algorithm, we put the compression speed before everything else?"**
 Of course, our compressed results should be reasonable enough; let's say it should be better than a baseline.
-Let's our baseline is a texture in RGB565 format downsampled by the factor of two which gives us the same memory
-footprint as DXT1/BC1.
+Let's set our baseline to a texture downsampled by the factor of two in RGB565 format which gives us the same memory footprint as DXT1/BC1.
 
 Why would we need a compressor that is very-very fast but cannot compete with well-known codecs in terms of quality?
 
