@@ -108,38 +108,51 @@ I appreciate any push requests and improvements. Feel free to ping me and/or sen
 
 
 * Basis Universal GPU Texture Codec by Binomial LLC
+
 https://github.com/BinomialLLC/basis_universal
 
 * DXT1/DXT5 compressor. Originally written by Fabian "ryg" Giesen
+
 https://github.com/nothings/stb/blob/master/stb_dxt.h
 
 * rg-etc1 encoder by Rich Geldreich
+
 https://github.com/richgel999/rg-etc1
 
 * Fast, single source file BC1-5 and BC7/BPTC GPU texture encoders by Rich Geldreich
+
 https://github.com/richgel999/bc7enc
 
 * ICBC - A High Quality BC1 Encoder by Ignacio Castano
+
 https://github.com/castano/icbc
 
 * The squish open source DXT compression library. Originally written by Simon Brown.
+
 https://github.com/Cavewhere/squish
 
 * Etc2Comp - Texture to ETC2 compressor. Originally written by Colt McAnlis.
+
 https://github.com/google/etc2comp
+
 https://medium.com/@duhroach/building-a-blazing-fast-etc2-compressor-307f3e9aad99
 
 * SIMD transposes by Fabian "ryg" Giesen
+
 https://fgiesen.wordpress.com/2013/07/09/simd-transposes-1/
 
 * Performance  Tuning for CPU. Part 2: Advanced SIMD Optimization by Marat Dukhan
+
 https://docs.google.com/presentation/u/1/d/1I0-SiHid1hTsv7tjLST2dYW5YF5AJVfs9l4Rg9rvz48/htmlpresent
 
 * A few missing SSE intrinsics by Alfred Klomp
+
 http://www.alfredklomp.com/programming/sse-intrinsics/
 
 * Accelerating Texture Compression with Intel Streaming SIMD Extensions by RADU V. (Intel)
+
 https://software.intel.com/en-us/articles/accelerating-texture-compression-with-intel-streaming-simd-extensions
 
 * KTX (Khronos Texture) Library and Tools
+
 https://github.com/KhronosGroup/KTX-Software
