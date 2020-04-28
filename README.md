@@ -64,12 +64,12 @@ Encoder | MP/s | RGB-PSNR (db)
 --- | --- | ---
 Baseline | n/a | 33.39 
 Goofy DXT1 | 1429 | 37.02
-icbc DXT1 (SSE2 enabled, fast DXT encoding using box fitting) | 24 | 41.00
-rgbcx (level0 low-quality)| 60 | 40.85
+icbc DXT1 v1.0 (SSE2 enabled, fast DXT encoding using box fitting) | 24 | 41.00
+rgbcx v1.08 (level0 low-quality)| 60 | 40.85
 ryg DXT1 (STB_DXT_NORMAL)| 43 | 40.82
 Goofy ETC1 | 1221 | 36.30
 Basisu ETC1 | n/a | 36.27
-rg ETC1 (low-quality, dithering disabled) | 3 | 40.87
+rg v1.04 ETC1 (low-quality, dithering disabled) | 3 | 40.87
 
 The following chart shows the RGB-PSNR vs. Performance for every image in the test image set.
 ![Comparison Chart](https://raw.githubusercontent.com/SergeyMakeev/goofy/master/Images/comparison_chart.png)
