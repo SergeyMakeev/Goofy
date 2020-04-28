@@ -58,16 +58,18 @@ https://github.com/castano/nvidia-texture-tools/wiki/RealTimeDXTCompression
 
 ## Comparison with other Encoders
 
+For all the encoders in the comparison, I've used the fastest available options/lowest quality.
+
 Encoder | MP/s | RGB-PSNR (db)
 --- | --- | ---
 Baseline | n/a | 33.39 
 Goofy DXT1 | 1429 | 37.02
-icbc DXT1 | 24 | 41.00
-rgbcx | 60 | 40.85
-ryg | 43 | 40.82
+icbc DXT1 (SSE2 enabled, fast DXT encoding using box fitting) | 24 | 41.00
+rgbcx (level0 low-quality)| 60 | 40.85
+ryg DXT1 (STB_DXT_NORMAL)| 43 | 40.82
 Goofy ETC1 | 1221 | 36.30
 Basisu ETC1 | n/a | 36.27
-rg ETC1 | 3 | 40.87
+rg ETC1 (low-quality, dithering disabled) | 3 | 40.87
 
 The following chart shows the RGB-PSNR vs. Performance for every image in the test image set.
 ![Comparison Chart](https://raw.githubusercontent.com/SergeyMakeev/goofy/master/Images/comparison_chart.png)
