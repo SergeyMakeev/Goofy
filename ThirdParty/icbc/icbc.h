@@ -231,7 +231,11 @@ inline bool equal(Vector3 a, Vector3 b, float epsilon) {
 #include <emmintrin.h>
 
 #define SIMD_INLINE inline
+#ifdef _WIN32
 #define SIMD_NATIVE __forceinline
+#else
+#define SIMD_NATIVE inline
+#endif
 
 class SimdVector
 {

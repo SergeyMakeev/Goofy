@@ -1,5 +1,12 @@
-#include <stdio.h>    // printf
+#include <stdio.h> // printf
 #include <unordered_map>
+
+#ifndef _WIN32
+#define __cdecl
+#define __stdcall
+#define __fastcall
+//and others
+#endif
 
 #define GOOFYTC_IMPLEMENTATION
 #include "../GoofyTC/goofy_tc.h"
@@ -19,6 +26,8 @@
 // reference goofy implementation
 #include "goofy_tc_reference.h"
 
+#include <chrono>
+
 #include "../ThirdParty/lodepng/lodepng.h"
 #include "../ThirdParty/lodepng/lodepng.cpp"
 
@@ -26,43 +35,21 @@
 
 const int kNumberOfIterations = 128;
 
-#ifdef WIN32
-// Windows High-Precision Timer
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <windows.h>
 struct Timer
 {
-    LARGE_INTEGER startingTime;
-    LARGE_INTEGER frequency;
+    std::chrono::time_point<std::chrono::high_resolution_clock> startingTime;
 
-    Timer()
-    {
-        QueryPerformanceFrequency(&frequency);
-    }
+    Timer() {}
 
-    void begin()
-    {
-        QueryPerformanceCounter(&startingTime);
-    }
+    void begin() { startingTime = std::chrono::high_resolution_clock::now(); }
 
     // return number of microseconds
     uint64_t end()
     {
-        LARGE_INTEGER endingTime;
-        QueryPerformanceCounter(&endingTime);
-
-        LARGE_INTEGER elapsedMicroseconds;
-        elapsedMicroseconds.QuadPart = endingTime.QuadPart - startingTime.QuadPart;
-        elapsedMicroseconds.QuadPart *= 1000000;
-        elapsedMicroseconds.QuadPart /= frequency.QuadPart;
-        return elapsedMicroseconds.QuadPart;
+        const auto endingTime = std::chrono::high_resolution_clock::now();
+        return std::chrono::duration_cast<std::chrono::microseconds>(endingTime - startingTime).count();
     }
-
 };
-#else
-#error "Need platform specific Timer implementation"
-#endif
 
 // KTX / DDS / TGA support
 // ============================================================================================
@@ -287,7 +274,7 @@ unsigned char* loadPngAsRgba8(const char* fileName, unsigned int* pWidth, unsign
     }
 
     size_t sizeInBytes = width * height * 4;
-    unsigned char* rgbaBuffer = (unsigned char*)_aligned_malloc(sizeInBytes, 64);
+    unsigned char* rgbaBuffer = (unsigned char*) aligned_alloc(sizeInBytes, 64);
     int bytesPerPixel = ((int)image.size() / (width * height));
 
     for (unsigned int y = 0; y < height; y++)
@@ -323,7 +310,7 @@ void destroyPng(unsigned char* rgba8)
     {
         return;
     }
-    _aligned_free(rgba8);
+    free(rgba8);
 }
 
 // ============================================================================================
@@ -999,6 +986,7 @@ int main()
     if (!resultsFile)
     {
         printf("Can't create file './test-results/results.txt'\n");
+        printf("Run GoofyTC in the project dir?\n");
         return -2;
     }
 
