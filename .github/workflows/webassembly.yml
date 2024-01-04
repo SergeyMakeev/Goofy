@@ -46,4 +46,4 @@ jobs:
       run: |
         pwd
         ls
-        wasmer run  ${{ steps.strings.outputs.build-output-dir }}/bin/GoofyTC.wasm -- 0 0
+        wasmer run --wasmer-dir . ${{ steps.strings.outputs.build-output-dir }}/bin/GoofyTC.wasm -- 0 0
