@@ -27,7 +27,7 @@ jobs:
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        emcmake cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_CXX_COMPILER=emcc
         -DCMAKE_C_COMPILER=emcc
         -DCMAKE_BUILD_TYPE=Release
@@ -37,7 +37,7 @@ jobs:
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config Release
+      run: emcmake cmake --build ${{ steps.strings.outputs.build-output-dir }} --config Release
 
     - name: Test on Linux
       if: matrix.os == 'ubuntu-latest'
