@@ -3,7 +3,9 @@
 #include <cstdlib>
 #include <unordered_map>
 
-#ifndef _WIN32
+#ifdef _WIN32
+#include <malloc.h>
+#else
 #define __cdecl
 #define __stdcall
 #define __fastcall
