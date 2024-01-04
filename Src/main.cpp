@@ -1,4 +1,5 @@
-#include <stdio.h> // printf
+#include <chrono>
+#include <cstdio>
 #include <unordered_map>
 
 #ifndef _WIN32
@@ -25,8 +26,6 @@
 
 // reference goofy implementation
 #include "goofy_tc_reference.h"
-
-#include <chrono>
 
 #include "../ThirdParty/lodepng/lodepng.h"
 #include "../ThirdParty/lodepng/lodepng.cpp"

@@ -5,12 +5,12 @@
 //  MIT license at the end of this file.
 
 #include <cassert>
+#include <cstdint>
+
 namespace goofy {
 int compressDXT1(unsigned char* result, const unsigned char* input, unsigned int width, unsigned int height, unsigned int stride);
 int compressETC1(unsigned char* result, const unsigned char* input, unsigned int width, unsigned int height, unsigned int stride);
 } // namespace goofy
-
-#include <stdint.h>
 
 // Enable SSE2 codec
 #define GOOFY_SSE2 (1)
