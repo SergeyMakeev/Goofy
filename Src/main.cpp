@@ -274,7 +274,7 @@ unsigned char* loadPngAsRgba8(const char* fileName, unsigned int* pWidth, unsign
     }
 
     size_t sizeInBytes = width * height * 4;
-    unsigned char* rgbaBuffer = (unsigned char*) aligned_alloc(sizeInBytes, 64);
+    unsigned char* rgbaBuffer = (unsigned char*) std::aligned_alloc(64, sizeInBytes);
     int bytesPerPixel = ((int)image.size() / (width * height));
 
     for (unsigned int y = 0; y < height; y++)

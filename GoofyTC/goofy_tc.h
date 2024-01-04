@@ -4,11 +4,11 @@
 // LICENSE:
 //  MIT license at the end of this file.
 
-namespace goofy
-{
-    int compressDXT1(unsigned char* result, const unsigned char* input, unsigned int width, unsigned int height, unsigned int stride);
-    int compressETC1(unsigned char* result, const unsigned char* input, unsigned int width, unsigned int height, unsigned int stride);
-}
+#include <cassert>
+namespace goofy {
+int compressDXT1(unsigned char* result, const unsigned char* input, unsigned int width, unsigned int height, unsigned int stride);
+int compressETC1(unsigned char* result, const unsigned char* input, unsigned int width, unsigned int height, unsigned int stride);
+} // namespace goofy
 
 #include <stdint.h>
 
@@ -1069,6 +1069,8 @@ enum GoofyCodecType
 template<GoofyCodecType CODEC_TYPE>
 goofy_inline void goofySimdEncode(const unsigned char* goofy_restrict inputRGBA, size_t inputStride, unsigned char* goofy_restrict pResult)
 {
+    assert(uintptr_t(inputRGBA) % 64 == 0); // make sure the input is 64 bit aligned.
+
     // Fetch 16x4 pixels from the buffer(four DX blocks)
     // 16 pixels wide is better for the CPU cache utilization (64 bytes per line) and it is better for SIMD lane utilization
     // -----------------------------------------------------------
