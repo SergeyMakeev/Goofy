@@ -282,7 +282,7 @@ unsigned char* loadPngAsRgba8(const char* fileName, unsigned int* pWidth, unsign
     unsigned char* rgbaBuffer = (unsigned char*) aligned_alloc(64, sizeInBytes);
 #endif
 
-    int bytesPerPixel = ((int)image.size() / (width * height));
+    int bytesPerPixel = ((int) image.size() / (width * height));
 
     for (unsigned int y = 0; y < height; y++)
     {
@@ -946,13 +946,16 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
 #define ARRAY_SIZE(v) (sizeof(v) / sizeof(v[0]))
 
 const char* testImages[] = {
+#ifdef ENABLE_LONG_TEST_RUN
     "patterns",
     "pbr_bricks_albedo",
     "pbr_ground_albedo",
     "pbr_stones_albedo",
     "pbr_stones_normal",
     "pbr_head_albedo",
+#endif
     "parrot_red",
+#ifdef ENABLE_LONG_TEST_RUN
     "baboon",
     "lena",
     "monarch",
@@ -989,6 +992,7 @@ const char* testImages[] = {
     "roblox04",
     "roblox05",
     "roblox06",
+#endif
 };
 
 int main()
