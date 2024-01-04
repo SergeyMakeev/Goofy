@@ -44,12 +44,4 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: |
-        ls
-        echo ===== touch ./test-results/results.txt
-        touch ./test-results/results.txt
-        echo ===== ls test-results
-        ls test-results
-        rm ./test-results/results.txt
-        echo ===== ls test-results
-        ls test-results
-        wasmtime --dir=. --dir=./test-data --dir=./test-results ${{ steps.strings.outputs.build-output-dir }}/bin/GoofyTC.wasm
+        wasmtime --dir=test-data --dir=test-results ${{ steps.strings.outputs.build-output-dir }}/bin/GoofyTC.wasm
