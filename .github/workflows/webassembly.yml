@@ -11,9 +11,9 @@ jobs:
     steps:
     - uses: mymindstorm/setup-emsdk@v13
     - uses: actions/checkout@v3
-    - uses: wasmerio/setup-wasmer@v3
+    - uses: bytecodealliance/actions/wasmtime/setup@v1
 
-    - name: Verify wasmtime
+    - name: Verify emcc
       run: emcc -v
 
     - name: Set reusable strings
@@ -44,4 +44,4 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: |
-        wasmer run --mapdir=.:. ${{ steps.strings.outputs.build-output-dir }}/bin/GoofyTC.wasm -- 0 0
+        wasmtime run --mapdir=.:. ${{ steps.strings.outputs.build-output-dir }}/bin/GoofyTC.wasm
