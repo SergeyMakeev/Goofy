@@ -62,14 +62,24 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DENABLE_ADDRESS_SANITIZER=ON
+        -DENABLE_LONG_TEST_RUN=OFF
         -S ${{ github.workspace }}
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-    - name: Test
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+    - name: Test on Linux
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: ${{ github.workspace }}
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest --build-config ${{ matrix.build_type }}
+      run: ${{ steps.strings.outputs.build-output-dir }}/bin/GoofyTC
+      
+    - name: Test on Linux
+      if: matrix.os == 'windows-latest'
+      working-directory: ${{ github.workspace }}
+      # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ${{ steps.strings.outputs.build-output-dir }}/bin/GoofyTC.exe
