@@ -274,7 +274,12 @@ unsigned char* loadPngAsRgba8(const char* fileName, unsigned int* pWidth, unsign
     }
 
     size_t sizeInBytes = width * height * 4;
-    unsigned char* rgbaBuffer = (unsigned char*) std::aligned_alloc(64, sizeInBytes);
+#ifdef _WIN32
+    unsigned char* rgbaBuffer = (unsigned char*) _aligned_alloc(sizeInBytes, 64);
+#else
+    unsigned char* rgbaBuffer = (unsigned char*) aligned_alloc(64, sizeInBytes);
+#endif
+
     int bytesPerPixel = ((int)image.size() / (width * height));
 
     for (unsigned int y = 0; y < height; y++)
@@ -310,7 +315,11 @@ void destroyPng(unsigned char* rgba8)
     {
         return;
     }
+#ifdef _WIN32
+    _aligned_free(rgba8);
+#else
     free(rgba8);
+#endif
 }
 
 // ============================================================================================
