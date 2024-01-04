@@ -3,9 +3,7 @@
 #include <cstdlib>
 #include <unordered_map>
 
-#ifdef _WIN32
-#include <malloc.h>
-#else
+#ifndef _WIN32
 #define __cdecl
 #define __stdcall
 #define __fastcall
@@ -277,7 +275,7 @@ unsigned char* loadPngAsRgba8(const char* fileName, unsigned int* pWidth, unsign
 
     size_t sizeInBytes = width * height * 4;
 #ifdef _WIN32
-    unsigned char* rgbaBuffer = (unsigned char*) _aligned_alloc(sizeInBytes, 64);
+    unsigned char* rgbaBuffer = (unsigned char*) _aligned_malloc(sizeInBytes, 64);
 #else
     unsigned char* rgbaBuffer = (unsigned char*) aligned_alloc(64, sizeInBytes);
 #endif
