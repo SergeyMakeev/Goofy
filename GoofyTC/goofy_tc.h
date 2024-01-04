@@ -51,7 +51,7 @@ uint8_t vector_get_by_index(__m128i V)
     // take from https://stackoverflow.com/a/12625215
     union {
         __m128i v;
-        uint8_t a[4];
+        uint8_t a[16];
     } converter;
     converter.v = V;
     return converter.a[i];
