@@ -77,9 +77,9 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ${{ steps.strings.outputs.build-output-dir }}/bin/GoofyTC
       
-    - name: Test on Linux
+    - name: Test on Windows
       if: matrix.os == 'windows-latest'
       working-directory: ${{ github.workspace }}
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: dir ${{ steps.strings.outputs.build-output-dir }}
+      run: dir ${{ steps.strings.outputs.build-output-dir }}/bin
