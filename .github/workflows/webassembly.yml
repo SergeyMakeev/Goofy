@@ -44,6 +44,4 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: |
-        pwd
-        ls
-        wasmer run --dir . ${{ steps.strings.outputs.build-output-dir }}/bin/GoofyTC.wasm -- 0 0
+        wasmer run --mapdir .:. ${{ steps.strings.outputs.build-output-dir }}/bin/GoofyTC.wasm -- 0 0
