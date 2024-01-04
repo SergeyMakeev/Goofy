@@ -26,7 +26,7 @@ int compressETC1(unsigned char* result, const unsigned char* input, unsigned int
 #endif
 
 #ifdef GOOFY_SSE2
-#include <immintrin.h> // SSE2
+#include <emmintrin.h> // SSE2
 #else
 #include <cstring> // memset/memcpy
 #endif
