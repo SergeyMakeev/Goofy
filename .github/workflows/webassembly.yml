@@ -17,6 +17,7 @@ jobs:
         wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_VERSION}/wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz
         tar xvf wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz
         echo "SDK_PATH=`pwd`/wasi-sdk-${WASI_VERSION_FULL}" >> "$GITHUB_OUTPUT"
+      working-directory: /home/runner
     - uses: actions/checkout@v3
     - uses: bytecodealliance/actions/wasmtime/setup@v1
 
@@ -31,7 +32,7 @@ jobs:
       run: |
         echo ${{ steps.strings.outputs.build-output-dir }}
         echo ${{ steps.wasi.outputs.SDK_PATH }}
-        ls /home/runner/work/Goofy/Goofy/
+        ls /home/runner/
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
