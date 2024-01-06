@@ -14,6 +14,8 @@ add_executable(${PROJECT_NAME}
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 if(EMSCRIPTEN)
+    # build standalone (no js code)
+    set(CMAKE_EXECUTABLE_SUFFIX ".wasm")
     target_compile_options(${PROJECT_NAME} PUBLIC -msimd128 -msse2)
 endif()
 
