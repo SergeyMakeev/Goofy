@@ -1,6 +1,7 @@
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <unordered_map>
 
 #ifndef _WIN32
@@ -258,6 +259,7 @@ unsigned char* loadPngAsRgba8(const char* fileName, unsigned int* pWidth, unsign
     if (error)
     {
         printf("Can't open image : %s, Error : %s\n", fileName, lodepng_error_text(error));
+        printf("Run GoofyTC in the project dir?\n");
         return nullptr;
     }
 
@@ -995,11 +997,11 @@ const char* testImages[] = {
 
 int main()
 {
+    std::filesystem::create_directories("./test-results");
     FILE* resultsFile = fopen("./test-results/results.txt", "w");
     if (!resultsFile)
     {
         printf("Can't create file './test-results/results.txt'\n");
-        printf("Run GoofyTC in the project dir?\n");
         return -2;
     }
 
