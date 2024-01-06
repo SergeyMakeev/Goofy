@@ -9,17 +9,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Setup wasi sdk
-      id: wasi
-      run: |
-        export WASI_VERSION=21
-        export WASI_VERSION_FULL=${WASI_VERSION}.0
-        wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_VERSION}/wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz
-        tar xvf wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz
-        echo "SDK_PATH=`pwd`/wasi-sdk-${WASI_VERSION_FULL}" >> "$GITHUB_OUTPUT"
-      working-directory: /home/runner
+    - uses: mymindstorm/setup-emsdk@v13
     - uses: actions/checkout@v3
     - uses: bytecodealliance/actions/wasmtime/setup@v1
+
+    - name: Verify emcc
+      run: emcc -v
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
@@ -28,18 +23,13 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: test wasi
-      run: |
-        echo ${{ steps.strings.outputs.build-output-dir }}
-        echo ${{ steps.wasi.outputs.SDK_PATH }}
-        ls /home/runner/
-
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_TOOLCHAIN_FILE=${{ steps.wasi.outputs.SDK_PATH }}/share/cmake/wasi-sdk.cmake
+        emcmake cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=emcc
+        -DCMAKE_C_COMPILER=emcc
         -DCMAKE_BUILD_TYPE=Release
         -DENABLE_ADDRESS_SANITIZER=ON
         -DENABLE_LONG_TEST_RUN=OFF
