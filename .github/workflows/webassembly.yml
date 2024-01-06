@@ -23,6 +23,54 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
+    - name: delete superfluous test data
+      run: |
+        rm -rf basis
+        rm patterns.png
+        rm patterns
+        rm pbr_bricks_albedo
+        rm pbr_ground_albedo
+        rm pbr_stones_albedo
+        rm pbr_stones_normal
+        rm pbr_head_albedo
+        rm baboon
+        rm lena
+        rm monarch
+        rm peppers
+        rm sail
+        rm tulips
+        rm kodim01
+        rm kodim02
+        rm kodim03
+        rm kodim04
+        rm kodim05
+        rm kodim06
+        rm kodim07
+        rm kodim08
+        rm kodim09
+        rm kodim10
+        rm kodim11
+        rm kodim12
+        rm kodim13
+        rm kodim14
+        rm kodim15
+        rm kodim16
+        rm kodim17
+        rm kodim18
+        rm kodim19
+        rm kodim20
+        rm kodim21
+        rm kodim22
+        rm kodim23
+        rm kodim24
+        rm roblox01
+        rm roblox02
+        rm roblox03
+        rm roblox04
+        rm roblox05
+        rm roblox06
+      working-directory: ${{ github.workspace }}/test-data
+
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
