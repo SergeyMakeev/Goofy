@@ -11,6 +11,8 @@ add_executable(${PROJECT_NAME}
     ../GoofyTC/goofy_tc.h
 )
 
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+
 if(EMSCRIPTEN)
     target_compile_options(${PROJECT_NAME} PUBLIC -msimd128 -msse2)
 endif()
