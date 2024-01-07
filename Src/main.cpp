@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
+#include <iostream>
 #include <unordered_map>
 
 #ifndef _WIN32
@@ -997,8 +998,11 @@ const char* testImages[] = {
 
 int main()
 {
+    std::cerr << "allo 1" << std::endl;
     std::filesystem::create_directories("./test-results");
+    std::cerr << "allo 2" << std::endl;
     FILE* resultsFile = fopen("./test-results/results.txt", "w");
+    std::cerr << "allo 3" << std::endl;
     if (!resultsFile)
     {
         printf("Can't create file './test-results/results.txt'\n");
@@ -1012,7 +1016,7 @@ int main()
         return -3;
     }
 
-
+    std::cerr << "allo 4" << std::endl;
     std::vector<TestResult> results;
     results.reserve(512);
 
@@ -1029,6 +1033,7 @@ int main()
 
     printf("Image;Encoder;Format;NumberOfPixels;time (us);MP/s;mseR;mseG;mseB;mseMax;mseRGB;mseY;psnrR (db);psnrG (db);psnrB (db);psnrMin (db);psnrRGB (db);psnrY (db);deltaMin (db);deltaRGB (db);deltaY (db)\n");
     fprintf(resultsFile, "Image;Encoder;Format;NumberOfPixels;time (us);MP/s;mseR;mseG;mseB;mseMax;mseRGB;mseY;psnrR (db);psnrG (db);psnrB (db);psnrMin (db);psnrRGB (db);psnrY (db);deltaMin (db);deltaRGB (db);deltaY (db)\n");
+    std::cerr << "allo 5" << std::endl;
     for(unsigned int i = 0; i < ARRAY_SIZE(testImages); i++)
     {
         bool res = runTest(resultsFile, testImages[i], results);
