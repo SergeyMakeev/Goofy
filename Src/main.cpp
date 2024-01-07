@@ -260,7 +260,6 @@ unsigned char* loadPngAsRgba8(const char* fileName, unsigned int* pWidth, unsign
     if (error)
     {
         printf("Can't open image : %s, Error : %s\n", fileName, lodepng_error_text(error));
-        printf("Run GoofyTC in the project dir?\n");
         return nullptr;
     }
 
@@ -999,13 +998,13 @@ const char* testImages[] = {
 int main()
 {
     std::cerr << "allo 1" << std::endl;
-    std::filesystem::create_directories("./test-results");
     std::cerr << "allo 2" << std::endl;
     FILE* resultsFile = fopen("./test-results/results.txt", "w");
     std::cerr << "allo 3" << std::endl;
     if (!resultsFile)
     {
         printf("Can't create file './test-results/results.txt'\n");
+        printf("Run GoofyTC in the project dir?\n");
         return -2;
     }
 
