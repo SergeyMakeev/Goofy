@@ -1022,6 +1022,7 @@ int main()
         double psnrRGBSum = 0.0;
         double psnrYSum = 0.0;
         double numberOfImages = 0.0;
+        double time = 0.0;
     };
     std::string tmp;
     std::unordered_map<std::string, CodecAvgPsnr> codecsAvg;
@@ -1044,23 +1045,25 @@ int main()
             codecAvg.psnrMinSum += r.msePsnr.psnrMin;
             codecAvg.psnrRGBSum += r.msePsnr.psnrRGB;
             codecAvg.psnrYSum += r.msePsnr.psnrY;
+            codecAvg.time += r.timeInMicroSeconds;
             codecAvg.numberOfImages += 1.0;
         }
     }
 
     printf("---[ Summary ]-------------\n");
-    printf("Codec;Format;Avg psnrMin (db);Avg psnrRGB (db); Avg psnrY (db);Number of tests\n");
-    fprintf(summaryFile, "Codec;Format;Avg psnrMin (db);Avg psnrRGB (db); Avg psnrY (db);Number of tests\n");
+    printf("Codec;Format                      Avg:     psnrMin   psnrRGB     psnrY   N tests   time (msec)\n");
+    fprintf(summaryFile, "Codec;Format;Avg psnrMin (db);Avg psnrRGB (db); Avg psnrY (db); Number of tests; Avg time (msec)\n");
     for (const auto& avg : codecsAvg)
     {
         double psnrMinAvg = avg.second.psnrMinSum / avg.second.numberOfImages;
-        tmp = psnrToString(psnrMinAvg) + ";";
+        tmp = psnrToString(psnrMinAvg) + "  ";
         double psnrRGBAvg = avg.second.psnrRGBSum / avg.second.numberOfImages;
-        tmp += psnrToString(psnrRGBAvg) + ";";
+        tmp += psnrToString(psnrRGBAvg) + "  ";
         double psnrYAvg = avg.second.psnrYSum / avg.second.numberOfImages;
         tmp += psnrToString(psnrYAvg);
-        printf("%s;%s;%.0f\n", avg.first.c_str(), tmp.c_str(), avg.second.numberOfImages);
-        fprintf(summaryFile, "%s;%s;%.0f\n", avg.first.c_str(), tmp.c_str(), avg.second.numberOfImages);
+        double timeAvg = avg.second.time / (avg.second.numberOfImages * 1000);
+        printf("%-40s  %s         %.0f        %5.1f\n", avg.first.c_str(), tmp.c_str(), avg.second.numberOfImages, timeAvg);
+        fprintf(summaryFile, "%s;%s;%.0f;%1.1f\n", avg.first.c_str(), tmp.c_str(), avg.second.numberOfImages, timeAvg);
     }
     printf("---------------------------\n");
 
