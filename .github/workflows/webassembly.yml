@@ -53,6 +53,7 @@ jobs:
       run: |
         env
         ls -l ${Qt6_DIR}/bin/
+        chmod u+x ${Qt6_DIR}/bin/*
 
     - name: Configure CMake
       env:
