@@ -52,7 +52,7 @@ jobs:
         CMAKE_PREFIX_PATH: ${{env.Qt6_DIR}}/lib/cmake
       run: |
         env
-        which qt-cmake
+        ls -l ${Qt6_DIR}/bin/
 
     - name: Configure CMake
       env:
