@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: mymindstorm/setup-emsdk@v13
+      with:
+        version: 3.1.37
     - uses: actions/checkout@v3
     - uses: bytecodealliance/actions/wasmtime/setup@v1
     - name: Install Qt native version (required by webassembly version)
