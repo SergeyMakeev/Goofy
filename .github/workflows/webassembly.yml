@@ -23,6 +23,9 @@ jobs:
         dir: '${{github.workspace}}/qt'
         install-deps: 'true'
 
+    - name: Set QT_HOST_PATH
+      run: echo "QT_HOST_PATH=${Qt6_DIR}" >> "$GITHUB_ENV"
+
     - name: Install Linux Dependencies
       run: sudo apt-get install -y build-essential ninja-build
 
