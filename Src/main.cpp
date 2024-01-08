@@ -7,6 +7,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <QImage>
+#include <catch2/catch_test_macros.hpp>
 #endif
 
 #ifndef _WIN32
@@ -152,6 +153,7 @@ struct TgaHeader
 
 void saveDds(const char* fileName, const unsigned char* data, size_t dataSize, uint32_t width, uint32_t height, uint32_t ddsFourCC)
 {
+#ifndef __EMSCRIPTEN__
     DdsHeader header;
     memset(&header, 0, sizeof(DdsHeader));
     header.magic = 0x20534444;
@@ -177,11 +179,12 @@ void saveDds(const char* fileName, const unsigned char* data, size_t dataSize, u
     {
         printf("Can't write file '%s'\n", fileName);
     }
-
+#endif
 }
 
 void saveKtx(const char* fileName, const unsigned char* data, size_t dataSize, uint32_t width, uint32_t height, uint32_t ktxFormat)
 {
+#ifndef __EMSCRIPTEN__
     KtxHeader header;
     memset(&header, 0, sizeof(KtxHeader));
     memcpy(&header.identifier[0], &kKtxIdentifier[0], 12);
@@ -213,7 +216,7 @@ void saveKtx(const char* fileName, const unsigned char* data, size_t dataSize, u
     {
         printf("Can't write file '%s'\n", fileName);
     }
-
+#endif
 }
 
 void saveTga(const char* fileName, const unsigned char* data, uint32_t width, uint32_t height)
@@ -278,8 +281,10 @@ unsigned char* loadPngAsRgba8(const char* fileName, unsigned int* pWidth, unsign
         // }
         QString qrc_filename = QString(":/") + fileName;
         QImage qimage(qrc_filename);
-        if (qimage.isNull())
+        if (qimage.isNull()) {
+            std::cout << "loading " << qrc_filename.toStdString() << " failed." << std::endl;
             return nullptr;
+        }
         if (qimage.format() != QImage::Format_ARGB32 && qimage.format() != QImage::Format_RGB32) {
             qimage = qimage.convertedTo(QImage::Format_ARGB32);
         }
@@ -292,13 +297,12 @@ unsigned char* loadPngAsRgba8(const char* fileName, unsigned int* pWidth, unsign
 
     if ((width % 16) != 0)
     {
-        printf("Incorrect width. Width should be a multiple of 16\n");
+        std::cout << "Incorrect width. Width should be a multiple of 16" << std::endl;
         return nullptr;
     }
 
-    if ((height % 4) != 0)
-    {
-        printf("Incorrect height. Height should be a multiple of 4\n");
+    if ((height % 4) != 0) {
+        std::cout << "Incorrect height. Width should be a multiple of 4" << std::endl;
         return nullptr;
     }
 
@@ -641,7 +645,7 @@ typedef int (__cdecl* CompressFunc_t)(unsigned char *dst, const unsigned char *s
 
 TestResult runTestDXT1(const char* encoderName, const char* imageName, CompressFunc_t func, Timer& timer, unsigned int numberOfIterations, unsigned char *dst, size_t dstSize, unsigned char* src, unsigned int w, unsigned int h, unsigned int stride, unsigned char* scratch)
 {
-    printf("DXT1 Encoder: %s (%s)                        \r", imageName, encoderName);
+    std::cout << "DXT1 Encoder: " << imageName << "(" << encoderName << ")" << std::endl;
 
     memset(dst, 0, dstSize);
   
@@ -691,7 +695,7 @@ TestResult runTestDXT1(const char* encoderName, const char* imageName, CompressF
 
 TestResult runTestETC1(const char* encoderName, const char* imageName, CompressFunc_t func, Timer& timer, unsigned int numberOfIterations, unsigned char *dst, size_t dstSize, unsigned char* src,  unsigned int w, unsigned int h, unsigned int stride, unsigned char* scratch)
 {
-    printf("ETC1 Encoder: %s (%s)                        \r", imageName, encoderName);
+    std::cout << "ETC1 Encoder: " << imageName << "(" << encoderName << ")" << std::endl;
 
     memset(dst, 0, dstSize);
     double bestTimeUs = DBL_MAX;
@@ -832,7 +836,7 @@ int rgCompressETC1(unsigned char *dst, const unsigned char *src, unsigned int w,
 bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& results)
 {
     results.clear();
-    printf("Image: %s                        \r", imageName);
+    std::cout << "Image: " << imageName << std::endl;
 
     std::string imageFilename = "test-data/";
     imageFilename += imageName;
@@ -857,11 +861,13 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
 
     unsigned int width = 0;
     unsigned int height = 0;
+    std::cout << "Image 2: " << imageName << std::endl;
     unsigned char* testImage = loadPngAsRgba8(imageFilename.c_str(), &width, &height);
     if (testImage == nullptr)
     {
         return false;
     }
+    std::cout << "Image 3: " << imageName << std::endl;
 
     unsigned int basisWidth = 0;
     unsigned int basisHeight = 0;
@@ -877,25 +883,28 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
 
     unsigned int stride = width * 4;
 
+    std::cout << "Image 4: " << imageName << std::endl;
     size_t sizeInBytes = width * height * 4;
     unsigned char* scratchBuffer = (unsigned char*)malloc(sizeInBytes);
     if (scratchBuffer == nullptr)
     {
-        printf("Can't allocate memory for scratch buffer\n");
+        std::cout << "Can't allocate memory for scratch buffer" << std::endl;
         return false;
     }
 
+    std::cout << "Image 5: " << imageName << std::endl;
     size_t compressedBufferSizeInBytes = sizeInBytes / 8;
     unsigned char* compressedBuffer = (unsigned char*)malloc(compressedBufferSizeInBytes);
-    if (compressedBuffer == nullptr)
-    {
-        printf("Can't allocate memory for compressed buffer\n");
+    if (compressedBuffer == nullptr) {
+        std::cout << "Can't allocate memory for compressed buffer" << std::endl;
         return false;
     }
     saveTga(referenceFilename.c_str(), testImage, width, height);
 
+    std::cout << "Image 6: " << imageName << std::endl;
     generateDownsamlpedRgb565Test(testImage, width, height, scratchBuffer);
 
+    std::cout << "Image 7: " << imageName << std::endl;
     TestResult baselineRes;
     baselineRes.encoderName = "Baseline (Downsample x2)";
     baselineRes.format = "RGB565";
@@ -905,7 +914,7 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
     results.emplace_back(baselineRes);
     saveTga(baselineFilename.c_str(), scratchBuffer, width, height);
 
-
+    std::cout << "Image 8: " << imageName << std::endl;
     TestResult res;
     if (basisImage)
     {
@@ -918,6 +927,7 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
         saveTga(basisOutFilename.c_str(), scratchBuffer, width, height);
     }
 
+    std::cout << "Image 9: " << imageName << std::endl;
     Timer timer;
 
     res = runTestETC1("simd_goofy", imageName, goofy::compressETC1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
@@ -945,6 +955,7 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
     // results.emplace_back(res);
 
     // print results
+    char printBuffer[1024 * 10];
     for (const TestResult& r : results)
     {
         double mps = 0;
@@ -956,8 +967,21 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
         double deltaPsnrMin = r.msePsnr.psnrMin - baselineRes.msePsnr.psnrMin;
         double deltaPsnrRgb = r.msePsnr.psnrRGB - baselineRes.msePsnr.psnrRGB;
         double deltaPsnrY = r.msePsnr.psnrY - baselineRes.msePsnr.psnrY;
-        printf("%s;%s;%s;%3.0f;%3.0f;%3.5f;%s;%3.5f;%3.5f;%3.5f\n", imageName, r.encoderName.c_str(), r.format.c_str(), r.numberOfPixels, r.timeInMicroSeconds, mps, formatResultsRGB(r.msePsnr).c_str(), deltaPsnrMin, deltaPsnrRgb, deltaPsnrY);
-#ifdef __EMSCRIPTEN__
+        sprintf(printBuffer,
+                "%s;%s;%s;%3.0f;%3.0f;%3.5f;%s;%3.5f;%3.5f;%3.5f\n",
+                imageName,
+                r.encoderName.c_str(),
+                r.format.c_str(),
+                r.numberOfPixels,
+                r.timeInMicroSeconds,
+                mps,
+                formatResultsRGB(r.msePsnr).c_str(),
+                deltaPsnrMin,
+                deltaPsnrRgb,
+                deltaPsnrY);
+        std::cout << printBuffer << std::endl;
+
+#ifndef __EMSCRIPTEN__
         fprintf(resultsFile, "%s;%s;%s;%3.0f;%3.0f;%3.5f;%s;%3.5f;%3.5f;%3.5f\n", imageName, r.encoderName.c_str(), r.format.c_str(), r.numberOfPixels, r.timeInMicroSeconds, mps, formatResultsRGB(r.msePsnr).c_str(), deltaPsnrMin, deltaPsnrRgb, deltaPsnrY);
 #endif
     }
@@ -1022,9 +1046,9 @@ const char* testImages[] = {
 #endif
 };
 
+#ifndef __EMSCRIPTEN__
 int main()
 {
-#ifndef __EMSCRIPTEN__
     FILE* resultsFile = fopen("./test-results/results.txt", "w");
     if (!resultsFile)
     {
@@ -1040,6 +1064,9 @@ int main()
         return -3;
     }
 #else
+
+TEST_CASE("main")
+{
     FILE* resultsFile = nullptr;
 #endif
 
@@ -1057,7 +1084,10 @@ int main()
     std::string tmp;
     std::unordered_map<std::string, CodecAvgPsnr> codecsAvg;
 
-    printf("Image;Encoder;Format;NumberOfPixels;time (us);MP/s;mseR;mseG;mseB;mseMax;mseRGB;mseY;psnrR (db);psnrG (db);psnrB (db);psnrMin (db);psnrRGB (db);psnrY (db);deltaMin (db);deltaRGB (db);deltaY (db)\n");
+    std::cout << "Image;Encoder;Format;NumberOfPixels;time "
+                 "(us);MP/s;mseR;mseG;mseB;mseMax;mseRGB;mseY;psnrR (db);psnrG (db);psnrB "
+                 "(db);psnrMin (db);psnrRGB (db);psnrY (db);deltaMin (db);deltaRGB (db);deltaY (db)"
+              << std::endl;
 #ifndef __EMSCRIPTEN__
     fprintf(resultsFile, "Image;Encoder;Format;NumberOfPixels;time (us);MP/s;mseR;mseG;mseB;mseMax;mseRGB;mseY;psnrR (db);psnrG (db);psnrB (db);psnrMin (db);psnrRGB (db);psnrY (db);deltaMin (db);deltaRGB (db);deltaY (db)\n");
     fprintf(summaryFile, "Codec;Format;Avg psnrMin (db);Avg psnrRGB (db); Avg psnrY (db); Number of tests; Avg time (msec)\n");
@@ -1067,8 +1097,12 @@ int main()
         bool res = runTest(resultsFile, testImages[i], results);
         if (!res)
         {
-            printf("Tetst failed\n");
+            std::cout << "Tetst " << i << " failed" << std::endl;
+#ifndef __EMSCRIPTEN__
             return -1;
+#else
+            REQUIRE(false);
+#endif
         }
 
         for (const TestResult& r : results)
@@ -1083,9 +1117,11 @@ int main()
         }
     }
 
-    printf("---[ Summary ]-------------\n");
-    printf("Codec;Format                      Avg:     psnrMin   psnrRGB     psnrY   N tests   time (msec)\n");
+    std::cout << "---[ Summary ]-------------\n";
+    std::cout << "Codec;Format                      Avg:     psnrMin   psnrRGB     psnrY   N tests "
+                 "  time (msec)\n";
 
+    char printBuffer[1024 * 10];
     for (const auto& avg : codecsAvg)
     {
         double psnrMinAvg = avg.second.psnrMinSum / avg.second.numberOfImages;
@@ -1095,17 +1131,25 @@ int main()
         double psnrYAvg = avg.second.psnrYSum / avg.second.numberOfImages;
         tmp += psnrToString(psnrYAvg);
         double timeAvg = avg.second.time / (avg.second.numberOfImages * 1000);
-        printf("%-40s  %s         %.0f        %5.1f\n", avg.first.c_str(), tmp.c_str(), avg.second.numberOfImages, timeAvg);
+        sprintf(printBuffer,
+                "%-40s  %s         %.0f        %5.1f\n",
+                avg.first.c_str(),
+                tmp.c_str(),
+                avg.second.numberOfImages,
+                timeAvg);
+        std::cout << printBuffer;
 #ifndef __EMSCRIPTEN__
         fprintf(summaryFile, "%s;%s;%.0f;%1.1f\n", avg.first.c_str(), tmp.c_str(), avg.second.numberOfImages, timeAvg);
 #endif
     }
-    printf("---------------------------\n");
+    std::cout << "---------------------------" << std::endl;
 
 #ifndef __EMSCRIPTEN__
     fclose(summaryFile);
     fclose(resultsFile);
 #endif
-    printf("Finished. Check './test-results/results.txt' for details\n");
+    std::cout << "Finished. Check './test-results/results.txt' for details" << std::endl;
+#ifndef __EMSCRIPTEN__
     return 0;
+#endif
 }

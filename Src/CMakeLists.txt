@@ -13,11 +13,23 @@ set(PROJECT_SOURCES
 
 
 if(EMSCRIPTEN)
+
+    alp_add_git_repository(qml_catch2_console URL https://github.com/AlpineMapsOrg/qml_catch2_console.git COMMITISH origin/main DO_NOT_ADD_SUBPROJECT)
+
     find_package(Qt6 REQUIRED COMPONENTS Core Gui)
     qt_standard_project_setup()
 
-    qt_add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
-    target_link_libraries(${PROJECT_NAME} PUBLIC Qt::Core Qt::Gui)
+    include(${qml_catch2_console_SOURCE_DIR}/src/qml_catch2_console.cmake)
+
+    set(ALP_WWW_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "path to the install directory (for webassembly files, i.e., www directory)")
+    add_qml_catch2_console_unittests(${PROJECT_NAME} ${PROJECT_SOURCES})
+    set(ALP_INSTALL_FILES
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.js"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.wasm"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.html"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/qtloader.js"
+    )
+    install(FILES ${ALP_INSTALL_FILES} DESTINATION ${ALP_WWW_INSTALL_DIR})
 
     qt_add_resources(${PROJECT_NAME} "test-data"
         BASE ".."
@@ -28,6 +40,7 @@ if(EMSCRIPTEN)
         qt_add_resources(${PROJECT_NAME} "test-data"
             BASE ".."
             FILES
+            ../test-data/parrot_red.png
             ../test-data/patterns.png
             ../test-data/pbr_bricks_albedo.png
             ../test-data/pbr_ground_albedo.png

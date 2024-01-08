@@ -13,9 +13,7 @@ int compressETC1(unsigned char* result, const unsigned char* input, unsigned int
 } // namespace goofy
 
 // Enable SSE2 codec
-#ifndef __EMSCRIPTEN__
 #define GOOFY_SSE2 (1)
-#endif
 
 #define goofy_restrict __restrict
 
