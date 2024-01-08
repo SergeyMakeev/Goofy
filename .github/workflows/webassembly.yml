@@ -12,7 +12,18 @@ jobs:
     - uses: mymindstorm/setup-emsdk@v13
     - uses: actions/checkout@v3
     - uses: bytecodealliance/actions/wasmtime/setup@v1
-    - name: Install Qt
+    - name: Install Qt native version (required by webassembly version)
+      uses: jurplel/install-qt-action@v3
+      with:
+        aqtversion: '==3.1.*'
+        version: '6.6.1'
+        host: linux
+        target: 'desktop'
+        arch: gcc_64
+        dir: '${{github.workspace}}/qt'
+        install-deps: 'true'
+
+    - name: Install Qt Webassembly version
       uses: jurplel/install-qt-action@v3
       with:
         aqtversion: '==3.1.*'
