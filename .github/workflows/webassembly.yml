@@ -44,12 +44,15 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
+    - name: env
+      env:
+        CMAKE_PREFIX_PATH: ${{env.Qt6_Dir}}/lib/cmake
+      run: env
+
     - name: Configure CMake
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt6_Dir}}/lib/cmake
       run: >
-        echo "env.Qt6_Dir = " ${{env.Qt6_Dir}}
-        echo "QT_ROOT_DIR = ${QT_ROOT_DIR}"
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_BUILD_TYPE=Release
         -DENABLE_ADDRESS_SANITIZER=ON
