@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #ifdef __EMSCRIPTEN__
-#include <QtGui/QImage>
+#include <QImage>
 #endif
 
 #ifndef _WIN32
