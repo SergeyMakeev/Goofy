@@ -23,6 +23,9 @@ jobs:
         dir: '${{github.workspace}}/qt'
         install-deps: 'true'
 
+    - name: Install Linux Dependencies
+      run: sudo apt-get install -y build-essential ninja-build
+
     - name: Install Qt Webassembly version
       uses: jurplel/install-qt-action@v3
       with:
@@ -55,7 +58,9 @@ jobs:
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt6_DIR}}/lib/cmake
       run: >
-        qt-cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        qt-cmake
+        -G Ninja
+        -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_CXX_COMPILER=emcc
         -DCMAKE_C_COMPILER=emcc
