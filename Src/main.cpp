@@ -957,7 +957,9 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
         double deltaPsnrRgb = r.msePsnr.psnrRGB - baselineRes.msePsnr.psnrRGB;
         double deltaPsnrY = r.msePsnr.psnrY - baselineRes.msePsnr.psnrY;
         printf("%s;%s;%s;%3.0f;%3.0f;%3.5f;%s;%3.5f;%3.5f;%3.5f\n", imageName, r.encoderName.c_str(), r.format.c_str(), r.numberOfPixels, r.timeInMicroSeconds, mps, formatResultsRGB(r.msePsnr).c_str(), deltaPsnrMin, deltaPsnrRgb, deltaPsnrY);
+#ifdef __EMSCRIPTEN__
         fprintf(resultsFile, "%s;%s;%s;%3.0f;%3.0f;%3.5f;%s;%3.5f;%3.5f;%3.5f\n", imageName, r.encoderName.c_str(), r.format.c_str(), r.numberOfPixels, r.timeInMicroSeconds, mps, formatResultsRGB(r.msePsnr).c_str(), deltaPsnrMin, deltaPsnrRgb, deltaPsnrY);
+#endif
     }
 
     free(compressedBuffer);
@@ -1037,6 +1039,8 @@ int main()
         printf("Can't create file './test-results/sumary.txt'\n");
         return -3;
     }
+#else
+    FILE* resultsFile = nullptr;
 #endif
 
     std::vector<TestResult> results;
