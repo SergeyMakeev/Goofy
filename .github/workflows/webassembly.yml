@@ -47,7 +47,9 @@ jobs:
     - name: env
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt6_DIR}}/lib/cmake
-      run: env
+      run: |
+        env
+        which qt-cmake
 
     - name: Configure CMake
       env:
@@ -55,6 +57,8 @@ jobs:
       run: >
         qt-cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_CXX_COMPILER=emcc
+        -DCMAKE_C_COMPILER=emcc
         -DENABLE_ADDRESS_SANITIZER=ON
         -DENABLE_LONG_TEST_RUN=OFF
         -S ${{ github.workspace }}
