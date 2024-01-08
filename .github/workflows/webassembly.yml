@@ -12,6 +12,16 @@ jobs:
     - uses: mymindstorm/setup-emsdk@v13
     - uses: actions/checkout@v3
     - uses: bytecodealliance/actions/wasmtime/setup@v1
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        aqtversion: '==3.1.*'
+        version: '6.6.1'
+        host: linux
+        target: 'desktop'
+        arch: wasm_singlethread
+        dir: '${{github.workspace}}/qt'
+        install-deps: 'true'
 
     - name: Verify emcc
       run: emcc -v
@@ -23,56 +33,9 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: delete superfluous test data
-      run: |
-        rm -rf basis
-        rm patterns.png
-        rm pbr_bricks_albedo.png
-        rm pbr_ground_albedo.png
-        rm pbr_stones_albedo.png
-        rm pbr_stones_normal.png
-        rm pbr_head_albedo.png
-        rm baboon.png
-        rm lena.png
-        rm monarch.png
-        rm peppers.png
-        rm sail.png
-        rm tulips.png
-        rm kodim01.png
-        rm kodim02.png
-        rm kodim03.png
-        rm kodim04.png
-        rm kodim05.png
-        rm kodim06.png
-        rm kodim07.png
-        rm kodim08.png
-        rm kodim09.png
-        rm kodim10.png
-        rm kodim11.png
-        rm kodim12.png
-        rm kodim13.png
-        rm kodim14.png
-        rm kodim15.png
-        rm kodim16.png
-        rm kodim17.png
-        rm kodim18.png
-        rm kodim19.png
-        rm kodim20.png
-        rm kodim21.png
-        rm kodim22.png
-        rm kodim23.png
-        rm kodim24.png
-        rm roblox01.png
-        rm roblox02.png
-        rm roblox03.png
-        rm roblox04.png
-        rm roblox05.png
-        rm roblox06.png
-      working-directory: ${{ github.workspace }}/test-data
-
     - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      env:
+        CMAKE_PREFIX_PATH: ${{env.Qt6_Dir}}/lib/cmake
       run: >
         emcmake cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_CXX_COMPILER=emcc

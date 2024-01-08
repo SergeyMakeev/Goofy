@@ -5,6 +5,10 @@
 #include <iostream>
 #include <unordered_map>
 
+#ifdef __EMSCRIPTEN__
+#include <QtGui/QImage>
+#endif
+
 #ifndef _WIN32
 #define __cdecl
 #define __stdcall
@@ -214,6 +218,7 @@ void saveKtx(const char* fileName, const unsigned char* data, size_t dataSize, u
 
 void saveTga(const char* fileName, const unsigned char* data, uint32_t width, uint32_t height)
 {
+#ifndef __EMSCRIPTEN__
     TgaHeader header;
     memset(&header, 0, sizeof(TgaHeader));
     header.imageType = 2;
@@ -244,10 +249,12 @@ void saveTga(const char* fileName, const unsigned char* data, uint32_t width, ui
     {
         printf("Can't write file '%s'\n", fileName);
     }
+#endif
 }
 
 unsigned char* loadPngAsRgba8(const char* fileName, unsigned int* pWidth, unsigned int* pHeight)
 {
+    // todo: conditionally load from qrc
     if (!pWidth || !pHeight)
     {
         return nullptr;
@@ -255,13 +262,33 @@ unsigned char* loadPngAsRgba8(const char* fileName, unsigned int* pWidth, unsign
 
     std::vector<unsigned char> image;
     unsigned int width, height;
+
+#ifndef __EMSCRIPTEN__
     unsigned int error = lodepng::decode(image, width, height, fileName);
 
-    if (error)
-    {
+    if (error) {
         printf("Can't open image : %s, Error : %s\n", fileName, lodepng_error_text(error));
         return nullptr;
     }
+#else
+    {
+        // QDirIterator it(":", QDirIterator::Subdirectories);
+        // while (it.hasNext()) {
+        //     qDebug() << it.next();
+        // }
+        QString qrc_filename = QString(":/") + fileName;
+        QImage qimage(qrc_filename);
+        if (qimage.isNull())
+            return nullptr;
+        if (qimage.format() != QImage::Format_ARGB32 && qimage.format() != QImage::Format_RGB32) {
+            qimage = qimage.convertedTo(QImage::Format_ARGB32);
+        }
+        width = qimage.width();
+        height = qimage.height();
+        image.reserve(width * height * 4);
+        std::copy(qimage.constBits(), qimage.constBits() + width * height * 4, std::back_inserter(image));
+    }
+#endif
 
     if ((width % 16) != 0)
     {
@@ -807,23 +834,23 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
     results.clear();
     printf("Image: %s                        \r", imageName);
 
-    std::string imageFilename = "./test-data/"; 
+    std::string imageFilename = "test-data/";
     imageFilename += imageName;
     imageFilename += ".png";
 
-    std::string basisFilename = "./test-data/basis/etc1/";
+    std::string basisFilename = "test-data/basis/etc1/";
     basisFilename += imageName;
     basisFilename += "_unpacked_rgb_ETC1_RGB_0000.png";
 
-    std::string referenceFilename = "./test-results/"; 
+    std::string referenceFilename = "test-results/";
     referenceFilename += imageName;
     referenceFilename += "_original.tga";
 
-    std::string baselineFilename = "./test-results/"; 
+    std::string baselineFilename = "test-results/";
     baselineFilename += imageName;
     baselineFilename += "_baseline.tga";
 
-    std::string basisOutFilename = "./test-results/";
+    std::string basisOutFilename = "test-results/";
     basisOutFilename += imageName;
     basisOutFilename += "_basis.tga";
 
@@ -865,9 +892,7 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
         printf("Can't allocate memory for compressed buffer\n");
         return false;
     }
-
     saveTga(referenceFilename.c_str(), testImage, width, height);
-
 
     generateDownsamlpedRgb565Test(testImage, width, height, scratchBuffer);
 
@@ -907,17 +932,17 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
     //res = runTestETC1("ref_goofy", imageName, goofyRef::compressETC1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
     //results.emplace_back(res);
 
-    res = runTestDXT1("ryg", imageName, rygCompressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
-    results.emplace_back(res);
+    // res = runTestDXT1("ryg", imageName, rygCompressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
+    // results.emplace_back(res);
 
-    res = runTestDXT1("rgbcx", imageName, rgbcxCompressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
-    results.emplace_back(res);
+    // res = runTestDXT1("rgbcx", imageName, rgbcxCompressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
+    // results.emplace_back(res);
 
-    res = runTestDXT1("icbc", imageName, icbcCompressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
-    results.emplace_back(res);
+    // res = runTestDXT1("icbc", imageName, icbcCompressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
+    // results.emplace_back(res);
 
-    res = runTestETC1("rg", imageName, rgCompressETC1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
-    results.emplace_back(res);
+    // res = runTestETC1("rg", imageName, rgCompressETC1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
+    // results.emplace_back(res);
 
     // print results
     for (const TestResult& r : results)
@@ -997,10 +1022,8 @@ const char* testImages[] = {
 
 int main()
 {
-    std::cerr << "allo 1" << std::endl;
-    std::cerr << "allo 2" << std::endl;
+#ifndef __EMSCRIPTEN__
     FILE* resultsFile = fopen("./test-results/results.txt", "w");
-    std::cerr << "allo 3" << std::endl;
     if (!resultsFile)
     {
         printf("Can't create file './test-results/results.txt'\n");
@@ -1014,8 +1037,8 @@ int main()
         printf("Can't create file './test-results/sumary.txt'\n");
         return -3;
     }
+#endif
 
-    std::cerr << "allo 4" << std::endl;
     std::vector<TestResult> results;
     results.reserve(512);
 
@@ -1031,8 +1054,10 @@ int main()
     std::unordered_map<std::string, CodecAvgPsnr> codecsAvg;
 
     printf("Image;Encoder;Format;NumberOfPixels;time (us);MP/s;mseR;mseG;mseB;mseMax;mseRGB;mseY;psnrR (db);psnrG (db);psnrB (db);psnrMin (db);psnrRGB (db);psnrY (db);deltaMin (db);deltaRGB (db);deltaY (db)\n");
+#ifndef __EMSCRIPTEN__
     fprintf(resultsFile, "Image;Encoder;Format;NumberOfPixels;time (us);MP/s;mseR;mseG;mseB;mseMax;mseRGB;mseY;psnrR (db);psnrG (db);psnrB (db);psnrMin (db);psnrRGB (db);psnrY (db);deltaMin (db);deltaRGB (db);deltaY (db)\n");
-    std::cerr << "allo 5" << std::endl;
+    fprintf(summaryFile, "Codec;Format;Avg psnrMin (db);Avg psnrRGB (db); Avg psnrY (db); Number of tests; Avg time (msec)\n");
+#endif
     for(unsigned int i = 0; i < ARRAY_SIZE(testImages); i++)
     {
         bool res = runTest(resultsFile, testImages[i], results);
@@ -1056,7 +1081,7 @@ int main()
 
     printf("---[ Summary ]-------------\n");
     printf("Codec;Format                      Avg:     psnrMin   psnrRGB     psnrY   N tests   time (msec)\n");
-    fprintf(summaryFile, "Codec;Format;Avg psnrMin (db);Avg psnrRGB (db); Avg psnrY (db); Number of tests; Avg time (msec)\n");
+
     for (const auto& avg : codecsAvg)
     {
         double psnrMinAvg = avg.second.psnrMinSum / avg.second.numberOfImages;
@@ -1067,12 +1092,16 @@ int main()
         tmp += psnrToString(psnrYAvg);
         double timeAvg = avg.second.time / (avg.second.numberOfImages * 1000);
         printf("%-40s  %s         %.0f        %5.1f\n", avg.first.c_str(), tmp.c_str(), avg.second.numberOfImages, timeAvg);
+#ifndef __EMSCRIPTEN__
         fprintf(summaryFile, "%s;%s;%.0f;%1.1f\n", avg.first.c_str(), tmp.c_str(), avg.second.numberOfImages, timeAvg);
+#endif
     }
     printf("---------------------------\n");
 
+#ifndef __EMSCRIPTEN__
     fclose(summaryFile);
     fclose(resultsFile);
+#endif
     printf("Finished. Check './test-results/results.txt' for details\n");
     return 0;
 }
