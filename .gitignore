@@ -10,3 +10,4 @@ test-results/sumary.txt
 test-data/basis/basisu.exe
 Images/*.psd
 test-data/basis/temp/*.basis
+/ThirdParty/extern/*

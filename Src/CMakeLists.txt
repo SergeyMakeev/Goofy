@@ -13,7 +13,6 @@ set(PROJECT_SOURCES
 
 
 if(EMSCRIPTEN)
-
     alp_add_git_repository(qml_catch2_console URL https://github.com/AlpineMapsOrg/qml_catch2_console.git COMMITISH origin/main DO_NOT_ADD_SUBPROJECT)
 
     find_package(Qt6 REQUIRED COMPONENTS Core Gui)
@@ -21,20 +20,20 @@ if(EMSCRIPTEN)
 
     include(${qml_catch2_console_SOURCE_DIR}/src/qml_catch2_console.cmake)
 
-    set(ALP_WWW_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "path to the install directory (for webassembly files, i.e., www directory)")
     add_qml_catch2_console_unittests(${PROJECT_NAME} ${PROJECT_SOURCES})
-    set(ALP_INSTALL_FILES
+    set(INSTALL_FILES
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.js"
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.wasm"
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.html"
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/qtloader.js"
     )
-    install(FILES ${ALP_INSTALL_FILES} DESTINATION ${ALP_WWW_INSTALL_DIR})
+    install(FILES ${INSTALL_FILES} DESTINATION ${AA_WWW_INSTALL_DIR})
 
     qt_add_resources(${PROJECT_NAME} "test-data"
         BASE ".."
         FILES
         ../test-data/parrot_red.png
+        ../test-data/basis/etc1/parrot_red_unpacked_rgb_ETC1_RGB_0000.png
     )
     if (ENABLE_LONG_TEST_RUN)
         qt_add_resources(${PROJECT_NAME} "test-data"
@@ -141,7 +140,7 @@ endif()
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 
-if (ENABLE_ADDRESS_SANITIZER)
+if (AA_ENABLE_ADDRESS_SANITIZER)
     message(NOTICE "building with address sanitizer enabled")
     if(MSVC)
         target_compile_options (${PROJECT_NAME} INTERFACE /fsanitize=address)
@@ -152,6 +151,6 @@ if (ENABLE_ADDRESS_SANITIZER)
     endif()
 endif()
 
-if (ENABLE_LONG_TEST_RUN)
+if (AA_ENABLE_LONG_TEST_RUN)
     target_compile_definitions(${PROJECT_NAME} PUBLIC "ENABLE_LONG_TEST_RUN")
 endif()

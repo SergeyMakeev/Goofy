@@ -836,7 +836,7 @@ int rgCompressETC1(unsigned char *dst, const unsigned char *src, unsigned int w,
 bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& results)
 {
     results.clear();
-    std::cout << "Image: " << imageName << std::endl;
+    std::cout << "Starting test on " << imageName << std::endl;
 
     std::string imageFilename = "test-data/";
     imageFilename += imageName;
@@ -861,13 +861,11 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
 
     unsigned int width = 0;
     unsigned int height = 0;
-    std::cout << "Image 2: " << imageName << std::endl;
     unsigned char* testImage = loadPngAsRgba8(imageFilename.c_str(), &width, &height);
     if (testImage == nullptr)
     {
         return false;
     }
-    std::cout << "Image 3: " << imageName << std::endl;
 
     unsigned int basisWidth = 0;
     unsigned int basisHeight = 0;
@@ -883,7 +881,6 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
 
     unsigned int stride = width * 4;
 
-    std::cout << "Image 4: " << imageName << std::endl;
     size_t sizeInBytes = width * height * 4;
     unsigned char* scratchBuffer = (unsigned char*)malloc(sizeInBytes);
     if (scratchBuffer == nullptr)
@@ -892,7 +889,6 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
         return false;
     }
 
-    std::cout << "Image 5: " << imageName << std::endl;
     size_t compressedBufferSizeInBytes = sizeInBytes / 8;
     unsigned char* compressedBuffer = (unsigned char*)malloc(compressedBufferSizeInBytes);
     if (compressedBuffer == nullptr) {
@@ -901,10 +897,8 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
     }
     saveTga(referenceFilename.c_str(), testImage, width, height);
 
-    std::cout << "Image 6: " << imageName << std::endl;
     generateDownsamlpedRgb565Test(testImage, width, height, scratchBuffer);
 
-    std::cout << "Image 7: " << imageName << std::endl;
     TestResult baselineRes;
     baselineRes.encoderName = "Baseline (Downsample x2)";
     baselineRes.format = "RGB565";
@@ -914,7 +908,6 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
     results.emplace_back(baselineRes);
     saveTga(baselineFilename.c_str(), scratchBuffer, width, height);
 
-    std::cout << "Image 8: " << imageName << std::endl;
     TestResult res;
     if (basisImage)
     {
@@ -927,7 +920,6 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
         saveTga(basisOutFilename.c_str(), scratchBuffer, width, height);
     }
 
-    std::cout << "Image 9: " << imageName << std::endl;
     Timer timer;
 
     res = runTestETC1("simd_goofy", imageName, goofy::compressETC1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
@@ -936,23 +928,23 @@ bool runTest(FILE* resultsFile, const char* imageName, std::vector<TestResult>& 
     res = runTestDXT1("simd_goofy", imageName, goofy::compressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
     results.emplace_back(res);
 
-    //res = runTestDXT1("ref_goofy", imageName, goofyRef::compressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
-    //results.emplace_back(res);
+    res = runTestDXT1("ref_goofy", imageName, goofyRef::compressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
+    results.emplace_back(res);
 
-    //res = runTestETC1("ref_goofy", imageName, goofyRef::compressETC1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
-    //results.emplace_back(res);
+    res = runTestETC1("ref_goofy", imageName, goofyRef::compressETC1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
+    results.emplace_back(res);
 
-    // res = runTestDXT1("ryg", imageName, rygCompressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
-    // results.emplace_back(res);
+    res = runTestDXT1("ryg", imageName, rygCompressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
+    results.emplace_back(res);
 
-    // res = runTestDXT1("rgbcx", imageName, rgbcxCompressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
-    // results.emplace_back(res);
+    res = runTestDXT1("rgbcx", imageName, rgbcxCompressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
+    results.emplace_back(res);
 
-    // res = runTestDXT1("icbc", imageName, icbcCompressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
-    // results.emplace_back(res);
+    res = runTestDXT1("icbc", imageName, icbcCompressDXT1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
+    results.emplace_back(res);
 
-    // res = runTestETC1("rg", imageName, rgCompressETC1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
-    // results.emplace_back(res);
+    res = runTestETC1("rg", imageName, rgCompressETC1, timer, kNumberOfIterations, compressedBuffer, compressedBufferSizeInBytes, testImage, width, height, stride, scratchBuffer);
+    results.emplace_back(res);
 
     // print results
     char printBuffer[1024 * 10];
