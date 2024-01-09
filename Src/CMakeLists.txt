@@ -82,49 +82,49 @@ if(EMSCRIPTEN)
             ../test-data/roblox04.png
             ../test-data/roblox05.png
             ../test-data/roblox06.png
-            ../test-data/basis/etc1/patterns_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/pbr_bricks_albedo_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/pbr_ground_albedo_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/pbr_stones_albedo_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/pbr_stones_normal_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/pbr_head_albedo_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/parrot_red_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/baboon_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/lena_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/monarch_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/peppers_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/sail_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/tulips_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim01_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim02_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim03_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim04_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim05_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim06_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim07_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim08_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim09_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim10_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim11_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim12_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim13_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim14_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim15_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim16_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim17_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim18_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim19_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim20_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim21_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim22_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim23_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/kodim24_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/roblox01_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/roblox02_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/roblox03_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/roblox04_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/roblox05_unpacked_rgb_ETC1_RGB_0000.png
-            ../test-data/basis/etc1/roblox06_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/patterns_unpacked_rgb_ETC1_RGB_0000.png           // can't compile with that many files
+            # ../test-data/basis/etc1/pbr_bricks_albedo_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/pbr_ground_albedo_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/pbr_stones_albedo_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/pbr_stones_normal_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/pbr_head_albedo_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/parrot_red_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/baboon_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/lena_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/monarch_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/peppers_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/sail_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/tulips_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim01_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim02_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim03_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim04_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim05_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim06_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim07_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim08_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim09_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim10_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim11_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim12_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim13_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim14_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim15_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim16_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim17_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim18_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim19_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim20_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim21_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim22_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim23_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/kodim24_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/roblox01_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/roblox02_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/roblox03_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/roblox04_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/roblox05_unpacked_rgb_ETC1_RGB_0000.png
+            # ../test-data/basis/etc1/roblox06_unpacked_rgb_ETC1_RGB_0000.png
         )
     endif()
 
