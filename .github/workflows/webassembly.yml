@@ -95,12 +95,10 @@ jobs:
     - name: Create artifact
       uses: actions/upload-artifact@v4
       with:
-        name: webassembly_tests
+        name: github-pages
         path: ${{ steps.strings.outputs.install-dir }}
         if-no-files-found: error
 
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
-      with:
-        artifact_name=webassembly_tests
