@@ -35,7 +35,7 @@ if(EMSCRIPTEN)
         ../test-data/parrot_red.png
         ../test-data/basis/etc1/parrot_red_unpacked_rgb_ETC1_RGB_0000.png
     )
-    if (ENABLE_LONG_TEST_RUN)
+    if (AA_ENABLE_LONG_TEST_RUN)
         qt_add_resources(${PROJECT_NAME} "test-data"
             BASE ".."
             FILES
