@@ -13,7 +13,6 @@ jobs:
       with:
         version: 3.1.37
     - uses: actions/checkout@v3
-    - uses: bytecodealliance/actions/wasmtime/setup@v1
     - name: Install Qt native version (required by webassembly version)
       uses: jurplel/install-qt-action@v3
       with:
@@ -51,6 +50,7 @@ jobs:
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "install-dir=${{ github.workspace }}/install" >> "$GITHUB_OUTPUT"
 
     - name: env
       env:
@@ -68,17 +68,17 @@ jobs:
         -G Ninja
         -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_BUILD_TYPE=Release
-        -DENABLE_ADDRESS_SANITIZER=ON
-        -DENABLE_LONG_TEST_RUN=OFF
+        -DAA_ENABLE_LONG_TEST_RUN=OFF
+        -DAA_WWW_INSTALL_DIR=${{ steps.strings.outputs.install-dir }}
+        -DFMT_INSTALL=OFF
         -S ${{ github.workspace }}
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config Release
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --target install --config Release
 
-    - name: Test on Linux
-      working-directory: ${{ github.workspace }}
-      # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: |
-        wasmtime ${{ steps.strings.outputs.build-output-dir }}/bin/GoofyTC.wasm
+    - name: Create artifact
+      uses: actions/upload-artifact@v4
+      name: webassembly_tests
+      path: ${{ steps.strings.outputs.install-dir }}
+      if-no-files-found: error
