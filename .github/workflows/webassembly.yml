@@ -115,8 +115,8 @@ jobs:
         echo "  </head>" >> ${{ steps.strings.outputs.install-dir }}/index.html
         echo "  <body>" >> ${{ steps.strings.outputs.install-dir }}/index.html
         echo "  <ul>" >> ${{ steps.strings.outputs.install-dir }}/index.html
-        echo "    <li><a href="./short/GoffyTC.html">short tests (be patient)</li>" >> ${{ steps.strings.outputs.install-dir }}/index.html
-        echo "    <li><a href="./long/GoffyTC.html">long tests (be super patient)</li>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "    <li><a href="./short/GoofyTC.html">short tests (be patient)</li>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "    <li><a href="./long/GoofyTC.html">long tests (be super patient)</li>" >> ${{ steps.strings.outputs.install-dir }}/index.html
         echo "    </ul>" >> ${{ steps.strings.outputs.install-dir }}/index.html
         echo "  </body>" >> ${{ steps.strings.outputs.install-dir }}/index.html
         echo "</html>" >> ${{ steps.strings.outputs.install-dir }}/index.html
