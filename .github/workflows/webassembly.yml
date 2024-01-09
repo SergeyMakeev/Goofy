@@ -53,6 +53,10 @@ jobs:
         dir: '${{github.workspace}}/qt'
         install-deps: 'true'
 
+    - name: Make qt webassembly binaries executable
+      run: |
+        chmod u+x ${Qt6_DIR}/bin/*
+
     - name: Verify emcc
       run: emcc -v
 
@@ -64,33 +68,37 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         echo "install-dir=${{ github.workspace }}/install" >> "$GITHUB_OUTPUT"
 
-    - name: env
-      env:
-        CMAKE_PREFIX_PATH: ${{env.Qt6_DIR}}/lib/cmake
-      run: |
-        env
-        ls -l ${Qt6_DIR}/bin/
-        chmod u+x ${Qt6_DIR}/bin/*
-
-    - name: Configure CMake
+    - name: Configure CMake for short tests
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt6_DIR}}/lib/cmake
       run: >
         ${Qt6_DIR}/bin/qt-cmake
         -G Ninja
-        -B ${{ steps.strings.outputs.build-output-dir }}
+        -B ${{ steps.strings.outputs.build-output-dir }}_short
         -DCMAKE_BUILD_TYPE=Release
         -DAA_ENABLE_LONG_TEST_RUN=OFF
-        -DAA_WWW_INSTALL_DIR=${{ steps.strings.outputs.install-dir }}
+        -DAA_WWW_INSTALL_DIR=${{ steps.strings.outputs.install-dir }}/short
         -DFMT_INSTALL=OFF
         -S ${{ github.workspace }}
 
-    - name: Build
-      # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --target install --config Release
+    - name: Build short tests
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }}_short --target install
 
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
+    - name: Configure CMake for long tests
+      env:
+        CMAKE_PREFIX_PATH: ${{env.Qt6_DIR}}/lib/cmake
+      run: >
+        ${Qt6_DIR}/bin/qt-cmake
+        -G Ninja
+        -B ${{ steps.strings.outputs.build-output-dir }}_long
+        -DCMAKE_BUILD_TYPE=Release
+        -DAA_ENABLE_LONG_TEST_RUN=ON
+        -DAA_WWW_INSTALL_DIR=${{ steps.strings.outputs.install-dir }}/long
+        -DFMT_INSTALL=OFF
+        -S ${{ github.workspace }}
+
+    - name: Build long tests
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }}_long --target install
 
     - name: Create artifact
       uses: actions/upload-artifact@v4
@@ -99,11 +107,39 @@ jobs:
         path: ${{ steps.strings.outputs.install-dir }}
         if-no-files-found: error
 
+    - name: Create index.html
+      run: |
+        echo "<html>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "  <head>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "    <title>Goffy Tests</title>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "  </head>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "  <body>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "  <ul>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "    <li><a href="./short/GoffyTC.html">short tests (be patient)</li>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "    <li><a href="./long/GoffyTC.html">long tests (be super patient)</li>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "    </ul>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "  </body>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "</html>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "" >> ${{ steps.strings.outputs.install-dir }}/index.html
+
     - name: Create Pages artifact
       uses: actions/upload-pages-artifact@v3
       with:
         path: ${{ steps.strings.outputs.install-dir }}
 
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
+
+    - name: Debug output
+      run: echo ${{ steps.deployment.outputs.page_url }}
