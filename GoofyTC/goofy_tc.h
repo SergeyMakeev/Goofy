@@ -4,27 +4,34 @@
 // LICENSE:
 //  MIT license at the end of this file.
 
-namespace goofy
-{
-    int compressDXT1(unsigned char* result, const unsigned char* input, unsigned int width, unsigned int height, unsigned int stride);
-    int compressETC1(unsigned char* result, const unsigned char* input, unsigned int width, unsigned int height, unsigned int stride);
-}
+#include <cassert>
+#include <cstdint>
 
-#include <stdint.h>
+namespace goofy {
+int compressDXT1(unsigned char* result, const unsigned char* input, unsigned int width, unsigned int height, unsigned int stride);
+int compressETC1(unsigned char* result, const unsigned char* input, unsigned int width, unsigned int height, unsigned int stride);
+} // namespace goofy
 
 // Enable SSE2 codec
 #define GOOFY_SSE2 (1)
 
 #define goofy_restrict __restrict
-#define goofy_inline __forceinline
 
+#ifdef _WIN32
+#define goofy_inline __forceinline
 #define goofy_align16(x) __declspec(align(16)) x
+#else
+#define goofy_inline inline
+#define goofy_align16(x) x __attribute__((aligned(16)))
+#endif
 
 #ifdef GOOFY_SSE2
-#include <emmintrin.h>  // SSE2
+#include <emmintrin.h> // SSE2
 #else
-#include <string> // memset/memcpy
+#include <cstring> // memset/memcpy
 #endif
+
+#define GOOFYTC_IMPLEMENTATION
 
 #ifdef GOOFYTC_IMPLEMENTATION
 namespace goofy
@@ -37,6 +44,18 @@ goofy_align16(static const uint32_t gConstMaxInt[4]) = { 0x7f7f7f7f, 0x7f7f7f7f,
 
 #ifdef GOOFY_SSE2
 typedef __m128i uint8x16_t;
+
+template<unsigned i>
+uint8_t vector_get_by_index(__m128i V)
+{
+    // take from https://stackoverflow.com/a/12625215
+    union {
+        __m128i v;
+        uint8_t a[16];
+    } converter;
+    converter.v = V;
+    return converter.a[i];
+}
 #else
 
 struct uint8x16_t
@@ -99,6 +118,12 @@ struct uint8x16_t
     };
 };
 
+template<unsigned i>
+uint8_t vector_get_by_index(uint8x16_t v)
+{
+    return v.data[i];
+}
+
 #endif
 
 
@@ -160,12 +185,12 @@ namespace simd
         return res;
     }
 
-    goofy_inline uint8x16_t or(const uint8x16_t& a, const uint8x16_t& b)
+    goofy_inline uint8x16_t bit_or(const uint8x16_t& a, const uint8x16_t& b)
     {
         return _mm_or_si128(a, b);
     }
 
-    goofy_inline uint8x16_t and(const uint8x16_t& a, const uint8x16_t& b)
+    goofy_inline uint8x16_t bit_and(const uint8x16_t& a, const uint8x16_t& b)
     {
         return _mm_and_si128(a, b);
     }
@@ -365,7 +390,7 @@ namespace simd
         return res;
     }
 
-    goofy_inline uint8x16_t not(const uint8x16_t& v)
+    goofy_inline uint8x16_t bitnot(const uint8x16_t& v)
     {
         return _mm_xor_si128(v, _mm_cmpeq_epi32(_mm_setzero_si128(), _mm_setzero_si128()));
     }
@@ -537,7 +562,7 @@ namespace simd
     }
 
     // bit or
-    goofy_inline uint8x16_t or(const uint8x16_t& a, const uint8x16_t& b)
+    goofy_inline uint8x16_t bit_or(const uint8x16_t& a, const uint8x16_t& b)
     {
         uint8x16_t res;
         for (uint32_t i = 0; i < 16; i++)
@@ -548,7 +573,7 @@ namespace simd
     }
 
     // bit and
-    goofy_inline uint8x16_t and(const uint8x16_t& a, const uint8x16_t& b)
+    goofy_inline uint8x16_t bit_and(const uint8x16_t& a, const uint8x16_t& b)
     {
         uint8x16_t res;
         for (uint32_t i = 0; i < 16; i++)
@@ -991,7 +1016,7 @@ namespace simd
         return res;
     }
 
-    goofy_inline uint8x16_t not(const uint8x16_t& v)
+    goofy_inline uint8x16_t bitnot(const uint8x16_t& v)
     {
         uint8x16_t res;
         for (int i = 0; i < 16; i++)
@@ -1044,6 +1069,8 @@ enum GoofyCodecType
 template<GoofyCodecType CODEC_TYPE>
 goofy_inline void goofySimdEncode(const unsigned char* goofy_restrict inputRGBA, size_t inputStride, unsigned char* goofy_restrict pResult)
 {
+    assert(uintptr_t(inputRGBA) % 64 == 0); // make sure the input is 64 bit aligned.
+
     // Fetch 16x4 pixels from the buffer(four DX blocks)
     // 16 pixels wide is better for the CPU cache utilization (64 bytes per line) and it is better for SIMD lane utilization
     // -----------------------------------------------------------
@@ -1188,7 +1215,7 @@ goofy_inline void goofySimdEncode(const unsigned char* goofy_restrict inputRGBA,
     const uint8x16_t bl0GezMask = simd::cmpeqi(bl0NegDiffY, constZero);
 
     // Absolute diffference of brightness (per-pixel in block)
-    const uint8x16_t bl0AbsDiffY = simd::or(bl0PosDiffY, bl0NegDiffY);
+    const uint8x16_t bl0AbsDiffY = simd::bit_or(bl0PosDiffY, bl0NegDiffY);
 
     // get quantization threshold for current block
     const uint8x16_t bl0QThreshold = simd::replicateU0000(blQThreshold);
@@ -1218,7 +1245,7 @@ goofy_inline void goofySimdEncode(const unsigned char* goofy_restrict inputRGBA,
     const uint8x16_t bl1PosDiffY = simd::minu(simd::subsatu(bl1Y, bl1MidY), constMaxInt);
     const uint8x16_t bl1NegDiffY = simd::minu(simd::subsatu(bl1MidY, bl1Y), constMaxInt);
     const uint8x16_t bl1GezMask = simd::cmpeqi(bl1NegDiffY, constZero);
-    const uint8x16_t bl1AbsDiffY = simd::or(bl1PosDiffY, bl1NegDiffY);
+    const uint8x16_t bl1AbsDiffY = simd::bit_or(bl1PosDiffY, bl1NegDiffY);
     const uint8x16_t bl1QThreshold = simd::replicateU1111(blQThreshold);
     const uint8x16_t bl1LqtMask = simd::cmplti(bl1AbsDiffY, bl1QThreshold);
 
@@ -1229,7 +1256,7 @@ goofy_inline void goofySimdEncode(const unsigned char* goofy_restrict inputRGBA,
     const uint8x16_t bl2PosDiffY = simd::minu(simd::subsatu(bl2Y, bl2MidY), constMaxInt);
     const uint8x16_t bl2NegDiffY = simd::minu(simd::subsatu(bl2MidY, bl2Y), constMaxInt);
     const uint8x16_t bl2GezMask = simd::cmpeqi(bl2NegDiffY, constZero);
-    const uint8x16_t bl2AbsDiffY = simd::or(bl2PosDiffY, bl2NegDiffY);
+    const uint8x16_t bl2AbsDiffY = simd::bit_or(bl2PosDiffY, bl2NegDiffY);
     const uint8x16_t bl2QThreshold = simd::replicateU2222(blQThreshold);
     const uint8x16_t bl2LqtMask = simd::cmplti(bl2AbsDiffY, bl2QThreshold);
 
@@ -1240,7 +1267,7 @@ goofy_inline void goofySimdEncode(const unsigned char* goofy_restrict inputRGBA,
     const uint8x16_t bl3PosDiffY = simd::minu(simd::subsatu(bl3Y, bl3MidY), constMaxInt);
     const uint8x16_t bl3NegDiffY = simd::minu(simd::subsatu(bl3MidY, bl3Y), constMaxInt);
     const uint8x16_t bl3GezMask = simd::cmpeqi(bl3NegDiffY, constZero);
-    const uint8x16_t bl3AbsDiffY = simd::or(bl3PosDiffY, bl3NegDiffY);
+    const uint8x16_t bl3AbsDiffY = simd::bit_or(bl3PosDiffY, bl3NegDiffY);
     const uint8x16_t bl3QThreshold = simd::replicateU3333(blQThreshold);
     const uint8x16_t bl3LqtMask = simd::cmplti(bl3AbsDiffY, bl3QThreshold);
 
@@ -1262,10 +1289,10 @@ goofy_inline void goofySimdEncode(const unsigned char* goofy_restrict inputRGBA,
         // Zip two masks to match DX bits order
         // Gez0 | Lqt0 | Gez1 | Lqt1 | Gez2 | Lqt2 | Gez3 | Lqt3 | Gez4 | Lqt4 | Gez5 | Lqt5 | Gez6 | Lqt6 | Gez7 | Lqt7
         // Gez8 | Lqt8 | Gez9 | Lqt9 | GezA | LqtA | GezB | LqtB | GezC | LqtC | GezD | LqtD | GezE | LqtE | GezF | LqtF
-        const uint8x16x2_t bl0RawIndices = simd::zipB16(simd::not(bl0GezMask), bl0LqtMask);
-        const uint8x16x2_t bl3RawIndices = simd::zipB16(simd::not(bl3GezMask), bl3LqtMask);
-        const uint8x16x2_t bl2RawIndices = simd::zipB16(simd::not(bl2GezMask), bl2LqtMask);
-        const uint8x16x2_t bl1RawIndices = simd::zipB16(simd::not(bl1GezMask), bl1LqtMask);
+        const uint8x16x2_t bl0RawIndices = simd::zipB16(simd::bitnot(bl0GezMask), bl0LqtMask);
+        const uint8x16x2_t bl3RawIndices = simd::zipB16(simd::bitnot(bl3GezMask), bl3LqtMask);
+        const uint8x16x2_t bl2RawIndices = simd::zipB16(simd::bitnot(bl2GezMask), bl2LqtMask);
+        const uint8x16x2_t bl1RawIndices = simd::zipB16(simd::bitnot(bl1GezMask), bl1LqtMask);
 
         // Bytes to bits
         uint32_t bl0Indices = simd::moveMaskMSB(bl0RawIndices.r0) | (simd::moveMaskMSB(bl0RawIndices.r1) << 16);
@@ -1331,12 +1358,10 @@ goofy_inline void goofySimdEncode(const unsigned char* goofy_restrict inputRGBA,
     else if (CODEC_TYPE == GOOFY_ETC1)
     {
         // Combined masks (major bit = GreaterEqualZero  other 7 bits = LessQuantizationThreshold)
-        const uint8x16x4_t blMasks = {
-            simd::or(simd::andnot(constMaxInt, bl0GezMask), simd::and(bl0LqtMask, constMaxInt)),
-            simd::or(simd::andnot(constMaxInt, bl1GezMask), simd::and(bl1LqtMask, constMaxInt)),
-            simd::or(simd::andnot(constMaxInt, bl2GezMask), simd::and(bl2LqtMask, constMaxInt)),
-            simd::or(simd::andnot(constMaxInt, bl3GezMask), simd::and(bl3LqtMask, constMaxInt))
-        };
+        const uint8x16x4_t blMasks = {simd::bit_or(simd::andnot(constMaxInt, bl0GezMask), simd::bit_and(bl0LqtMask, constMaxInt)),
+                                      simd::bit_or(simd::andnot(constMaxInt, bl1GezMask), simd::bit_and(bl1LqtMask, constMaxInt)),
+                                      simd::bit_or(simd::andnot(constMaxInt, bl2GezMask), simd::bit_and(bl2LqtMask, constMaxInt)),
+                                      simd::bit_or(simd::andnot(constMaxInt, bl3GezMask), simd::bit_and(bl3LqtMask, constMaxInt))};
 
         //  +---+---+---+---+           +---+---+---+---+
         //  | A | B | C | D |           | C | G | K | O |
@@ -1355,10 +1380,10 @@ goofy_inline void goofySimdEncode(const unsigned char* goofy_restrict inputRGBA,
         const uint32_t bl2PosOrZero = simd::moveMaskMSB(blMasksTr.r2);
         const uint32_t bl3PosOrZero = simd::moveMaskMSB(blMasksTr.r3);
 
-        uint8x16_t bl0LessThanQtMask = simd::and(blMasksTr.r0, constMaxInt);
-        uint8x16_t bl1LessThanQtMask = simd::and(blMasksTr.r1, constMaxInt);
-        uint8x16_t bl2LessThanQtMask = simd::and(blMasksTr.r2, constMaxInt);
-        uint8x16_t bl3LessThanQtMask = simd::and(blMasksTr.r3, constMaxInt);
+        uint8x16_t bl0LessThanQtMask = simd::bit_and(blMasksTr.r0, constMaxInt);
+        uint8x16_t bl1LessThanQtMask = simd::bit_and(blMasksTr.r1, constMaxInt);
+        uint8x16_t bl2LessThanQtMask = simd::bit_and(blMasksTr.r2, constMaxInt);
+        uint8x16_t bl3LessThanQtMask = simd::bit_and(blMasksTr.r3, constMaxInt);
         bl0LessThanQtMask = simd::addsatu(bl0LessThanQtMask, bl0LessThanQtMask);
         bl1LessThanQtMask = simd::addsatu(bl1LessThanQtMask, bl1LessThanQtMask);
         bl2LessThanQtMask = simd::addsatu(bl2LessThanQtMask, bl2LessThanQtMask);
@@ -1413,7 +1438,7 @@ goofy_inline void goofySimdEncode(const unsigned char* goofy_restrict inputRGBA,
         const uint8x16_t blPosCorrectionY = simd::minu(simd::subsatu(blMidY, blAvgY.r0), constMaxInt);
         const uint8x16_t blNegCorrectionY = simd::minu(simd::subsatu(blAvgY.r0, blMidY), constMaxInt);
         const uint8x16_t blCorrectionYGezMask = simd::cmpeqi(blNegCorrectionY, constZero);
-        const uint8x16_t blCorrectionYAbs = simd::or(blPosCorrectionY, blNegCorrectionY);
+        const uint8x16_t blCorrectionYAbs = simd::bit_or(blPosCorrectionY, blNegCorrectionY);
 
         // Get the color in the middle between  min/max colors of the block.
         // NOTE: this is not the same as an average block color.
@@ -1450,19 +1475,19 @@ goofy_inline void goofySimdEncode(const unsigned char* goofy_restrict inputRGBA,
 
         uint32_t* goofy_restrict pDest = (uint32_t* goofy_restrict)pResult;
 
-        const uint32_t block0a = etc1BrighnessRangeTocontrolByte[blRangeY.m128i_u8[0]] | ((baseColors.r0 << 3ull) & 0xFFFFFF);
+        const uint32_t block0a = etc1BrighnessRangeTocontrolByte[vector_get_by_index<0>(blRangeY)] | ((baseColors.r0 << 3ull) & 0xFFFFFF);
         const uint32_t block0b = ~(bl0PosOrZero | (bl0LessThanQt << 16));
         *pDest = block0a; pDest++; *pDest = block0b;
 
-        const uint32_t block1a = etc1BrighnessRangeTocontrolByte[blRangeY.m128i_u8[4]] | ((baseColors.r0 >> 29ull) & 0xFFFFFF);
+        const uint32_t block1a = etc1BrighnessRangeTocontrolByte[vector_get_by_index<4>(blRangeY)] | ((baseColors.r0 >> 29ull) & 0xFFFFFF);
         const uint32_t block1b = ~(bl1PosOrZero | (bl1LessThanQt << 16));
         pDest++; *pDest = block1a; pDest++; *pDest = block1b;
 
-        const uint32_t block2a = etc1BrighnessRangeTocontrolByte[blRangeY.m128i_u8[8]] | ((baseColors.r1 << 3ull) & 0xFFFFFF);
+        const uint32_t block2a = etc1BrighnessRangeTocontrolByte[vector_get_by_index<8>(blRangeY)] | ((baseColors.r1 << 3ull) & 0xFFFFFF);
         const uint32_t block2b = ~(bl2PosOrZero | (bl2LessThanQt << 16));
         pDest++; *pDest = block2a; pDest++; *pDest = block2b;
 
-        const uint32_t block3a = etc1BrighnessRangeTocontrolByte[blRangeY.m128i_u8[12]] | ((baseColors.r1 >> 29ull) & 0xFFFFFF);
+        const uint32_t block3a = etc1BrighnessRangeTocontrolByte[vector_get_by_index<12>(blRangeY)] | ((baseColors.r1 >> 29ull) & 0xFFFFFF);
         const uint32_t block3b = ~(bl3PosOrZero | (bl3LessThanQt << 16));
         pDest++; *pDest = block3a; pDest++; *pDest = block3b;
     }

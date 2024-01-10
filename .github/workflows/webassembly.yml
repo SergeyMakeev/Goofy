@@ -1,0 +1,145 @@
+name: "webassembly"
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: mymindstorm/setup-emsdk@v13
+      with:
+        version: 3.1.37
+    - uses: actions/checkout@v3
+    - name: Install Qt native version (required by webassembly version)
+      uses: jurplel/install-qt-action@v3
+      with:
+        aqtversion: '==3.1.*'
+        version: '6.6.1'
+        host: linux
+        target: 'desktop'
+        arch: gcc_64
+        dir: '${{github.workspace}}/qt'
+        install-deps: 'true'
+
+    - name: Set QT_HOST_PATH
+      run: echo "QT_HOST_PATH=${Qt6_DIR}" >> "$GITHUB_ENV"
+
+    - name: Install Linux Dependencies
+      run: sudo apt-get install -y build-essential ninja-build
+
+    - name: Install Qt Webassembly version
+      uses: jurplel/install-qt-action@v3
+      with:
+        aqtversion: '==3.1.*'
+        version: '6.6.1'
+        host: linux
+        target: 'desktop'
+        arch: wasm_singlethread
+        dir: '${{github.workspace}}/qt'
+        install-deps: 'true'
+
+    - name: Make qt webassembly binaries executable
+      run: |
+        chmod u+x ${Qt6_DIR}/bin/*
+
+    - name: Verify emcc
+      run: emcc -v
+
+    - name: Set reusable strings
+      # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "install-dir=${{ github.workspace }}/install" >> "$GITHUB_OUTPUT"
+
+    - name: Configure CMake for short tests
+      env:
+        CMAKE_PREFIX_PATH: ${{env.Qt6_DIR}}/lib/cmake
+      run: >
+        ${Qt6_DIR}/bin/qt-cmake
+        -G Ninja
+        -B ${{ steps.strings.outputs.build-output-dir }}_short
+        -DCMAKE_BUILD_TYPE=Release
+        -DAA_ENABLE_LONG_TEST_RUN=OFF
+        -DAA_WWW_INSTALL_DIR=${{ steps.strings.outputs.install-dir }}/short
+        -DFMT_INSTALL=OFF
+        -S ${{ github.workspace }}
+
+    - name: Build short tests
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }}_short --target install
+
+    - name: Configure CMake for long tests
+      env:
+        CMAKE_PREFIX_PATH: ${{env.Qt6_DIR}}/lib/cmake
+      run: >
+        ${Qt6_DIR}/bin/qt-cmake
+        -G Ninja
+        -B ${{ steps.strings.outputs.build-output-dir }}_long
+        -DCMAKE_BUILD_TYPE=Release
+        -DAA_ENABLE_LONG_TEST_RUN=ON
+        -DAA_WWW_INSTALL_DIR=${{ steps.strings.outputs.install-dir }}/long
+        -DFMT_INSTALL=OFF
+        -S ${{ github.workspace }}
+
+    - name: Build long tests
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }}_long --target install
+
+    - name: Create artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: webassembly_tests
+        path: ${{ steps.strings.outputs.install-dir }}
+        if-no-files-found: error
+
+    - name: Create index.html
+      run: |
+        echo "<html>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "  <head>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "    <title>Goffy Tests</title>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "  </head>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "  <body>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "  <ul>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "    <li><a href="./short/GoofyTC.html">short tests (be patient)</li>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "    <li><a href="./long/GoofyTC.html">long tests (be super patient)</li>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "    </ul>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "  </body>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "</html>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "" >> ${{ steps.strings.outputs.install-dir }}/index.html
+
+    - name: Create Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ${{ steps.strings.outputs.install-dir }}
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
+    - name: Debug output
+      run: echo ${{ steps.deployment.outputs.page_url }}

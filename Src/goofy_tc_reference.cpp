@@ -1,8 +1,11 @@
 #include "goofy_tc_reference.h"
 
-#include <assert.h>
-#include <string.h> // memcpy
 #include <algorithm> // min/max
+#include <assert.h>
+#include <cmath>
+#include <cstdint>
+#include <cstdio>
+#include <string.h> // memcpy
 
 namespace goofyRef
 {
