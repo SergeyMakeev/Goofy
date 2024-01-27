@@ -1,6 +1,7 @@
 # Goofy - Realtime DXT1/ETC1 encoder
 
-[![Actions Status](https://github.com/SergeyMakeev/Goofy/workflows/build/badge.svg)](https://github.com/SergeyMakeev/Goofy/actions)
+[![Actions Status](https://github.com/SergeyMakeev/Goofy/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/SergeyMakeev/Goofy/actions)
+[![Actions Status](https://github.com/SergeyMakeev/Goofy/actions/workflows/webassembly.yml/badge.svg)](https://github.com/SergeyMakeev/Goofy/actions)
 
 ## About
 
