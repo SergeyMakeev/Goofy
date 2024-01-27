@@ -1,5 +1,7 @@
 # Goofy - Realtime DXT1/ETC1 encoder
 
+[![Actions Status](https://github.com/SergeyMakeev/Goofy/workflows/build/badge.svg)](https://github.com/SergeyMakeev/Goofy/actions)
+
 ## About
 
 This is a very fast DXT/ETC encoder that I wrote, checking out the following idea. **"What if while we design a block compression algorithm, we put the compression speed before everything else?"**
