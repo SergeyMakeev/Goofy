@@ -111,7 +111,7 @@ jobs:
       run: |
         echo "<html>" >> ${{ steps.strings.outputs.install-dir }}/index.html
         echo "  <head>" >> ${{ steps.strings.outputs.install-dir }}/index.html
-        echo "    <title>Goffy Tests</title>" >> ${{ steps.strings.outputs.install-dir }}/index.html
+        echo "    <title>Goofy Tests</title>" >> ${{ steps.strings.outputs.install-dir }}/index.html
         echo "  </head>" >> ${{ steps.strings.outputs.install-dir }}/index.html
         echo "  <body>" >> ${{ steps.strings.outputs.install-dir }}/index.html
         echo "  <ul>" >> ${{ steps.strings.outputs.install-dir }}/index.html
